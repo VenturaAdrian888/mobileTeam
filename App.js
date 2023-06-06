@@ -1,75 +1,28 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import React, { useState, useEffect } from "react";
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import LoginScreen from './screens/LoginScreen';
+import HomeScreen from './screens/HomeScreen';
 
-import { firebase } from "./config";
+const Stack = createNativeStackNavigator();
 
-import Login from "./src/Login";
-import Register from "./src/Register";
-import Dashboard from "./src/Dashboard";
-import HeaderMain from "./components/HeaderMain";
-
-const Stack = createStackNavigator();
-
-function App() {
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState();
-
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
-
-  useEffect(() => {
-    const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber;
-  }, []);
-
-  if (initializing) return null;
-
-  if (!user) {
-    return (
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{
-            headerShown: false
-          }} />
-
-        <Stack.Screen
-          name="Register"
-          component={Register}
-          options={{
-            headerTitle: () => <HeaderMain name="Register" />,
-            headerStyle: {
-              height: 100,
-              backgroundColor: 'white',
-            }
-          }}
-        />
-      </Stack.Navigator>
-    );
-  }
-  return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Dashboard"
-        component={Dashboard}
-        options={{
-          headerShown: false
-        }}
-
-      />
-    </Stack.Navigator>
-  )
-}
-export default () => {
+export default function App() {
   return (
     <NavigationContainer>
-
-      <App />
-
+      <Stack.Navigator>
+        <Stack.Screen options = {{headerShown: false}}name="Login" component={LoginScreen} />
+        <Stack.Screen name="Home" component={HomeScreen}  />
+      </Stack.Navigator>
     </NavigationContainer>
-  )
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
