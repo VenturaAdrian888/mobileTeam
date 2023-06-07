@@ -3,7 +3,9 @@ import React, { useEffect, useState } from 'react'
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 // import { auth } from '../firebase'
 import { firebase } from '../firebase'
-import { getAuth,createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword  } from "firebase/auth";
+
+
 
 const LoginScreen = () => {
   const todoRef = firebase.firestore().collection('Users');
@@ -17,23 +19,32 @@ const LoginScreen = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
-        navigation.navigate("Home")
+        navigation.navigate("Dashboard")
       }
     })
 
     return unsubscribe
   }, [])
 
-  const handleSignUp = () => {
+//sign up 
+  const handleSignUp = async () => {
+    const querySnapshot = await todoRef.get();
+    const users = [email];
+      querySnapshot.forEach((documentSnapshot)=>{
+          const userdata = documentSnapshot.data();
+      })
+
     if (email.length == 0) {
       alert("Please Enter Email");
     }
+    //validate if meron ng existing user
+    else if ('auth/email-already-in-use'){
+      alert("Email is already used")
+    }
     else if  (password.length == 0){
-      alert("Please Enter Password");
+      alert("Please Enter Password")
     }
-    else if(email.to){
-
-    }
+    
     else{
       const data ={
         email: email,
@@ -41,7 +52,7 @@ const LoginScreen = () => {
         availableAmount: availableAmount,
          
       }
-      todoRef
+      todoRef // To Save inputed credentials in firestore
           .add(data).then(()=>{
             setEmail('');
             setPassword('');
@@ -50,27 +61,36 @@ const LoginScreen = () => {
             alert(error)
           })
       createUserWithEmailAndPassword(auth, email, password)
-      .then(userCredentials => {
+      .then((userCredentials) => {
         const user = userCredentials.user;
         console.log('Registered with:', user.email);
       }).catch((error)=>{
-        alert(error)
+        const errorMessage = error.message;
+        console.log(errorMessage);
       })
-    
     }
-      
-     
   }
+//Sign in..
+
+
 
   const handleLogin = () => {
-    auth
-      .signInWithEmailAndPassword(email, password)
+      
+
+    if(email.length == 0){
+      alert("Please Enter Email!");
+    }
+    
+    else {
+      signInWithEmailAndPassword(auth, email, password)
       .then(userCredentials => {
         const user = userCredentials.user;
         console.log('Logged in with:', user.email);
       })
       .catch(error => alert(error.message))
-  }
+    }
+  };
+
 
   return (
     <KeyboardAvoidingView
