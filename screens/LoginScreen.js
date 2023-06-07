@@ -19,7 +19,7 @@ const LoginScreen = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
-        navigation.navigate("Dashboard")
+        navigation.navigate("Main")
       }
     })
 
@@ -38,9 +38,9 @@ const LoginScreen = () => {
       alert("Please Enter Email");
     }
     //validate if meron ng existing user
-    else if ('auth/email-already-in-use'){
-      alert("Email is already used")
-    }
+    // else if ('auth/email-already-in-use'){
+    //   alert("Email is already used")
+    // }
     else if  (password.length == 0){
       alert("Please Enter Password")
     }
@@ -49,7 +49,7 @@ const LoginScreen = () => {
       const data ={
         email: email,
         password: password,
-        availableAmount: availableAmount,
+        availableAmount: Number( availableAmount),
          
       }
       todoRef // To Save inputed credentials in firestore

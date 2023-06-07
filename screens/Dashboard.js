@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Pressable, TextInput, Button, Touchable, TouchableOpacity } from 'react-native';
 import React ,{useState, useEffect} from 'react';
 import { auth, firebase } from '../firebase';
 import {collection, setDoc, doc, getDoc} from 'firebase/firestore'
@@ -8,6 +8,13 @@ const Dashboard = () => {
     const [users, setUsers] = useState([]);
     const todoRef = firebase.firestore().collection('Users');
 
+    const [id , setId] = useState('')
+    const [email, setEmail] = useState('');
+    const [ availableAmount, setAvailableAmount] = useState('')
+    const [ newavailableAmount, setNewAvailableAmount] = useState('')
+    const asd = 'Ceua2O9PgXnDDSFMGGFD'
+   
+
     
     useEffect( () => {
       
@@ -16,10 +23,10 @@ const Dashboard = () => {
         querySnapshot => {
           const users = []
           querySnapshot.forEach((doc) => {
-            const {availableAmount, email} = doc.data()
+            const {id, availableAmount, email} = doc.data()
               users.push({
                 id: doc.id,
-                availableAmount,
+                 availableAmount,
                 email,
               }) 
           }) 
@@ -27,6 +34,17 @@ const Dashboard = () => {
         }
       )
     },[])
+
+    const updateData = () => {
+      todoRef
+      .doc(asd)
+      .update({
+        availableAmount: Number(availableAmount),
+      })
+      .then (() =>{
+        console.log(availableAmount);
+      })
+    };
       
   return (
     <View style= {{ flex:1, marginTop:100}}>
@@ -40,11 +58,31 @@ const Dashboard = () => {
             >
                 <View style={styles.innerContainer}>
                   <Text style={styles.itemHeading}>{item.email}</Text>
-                  <Text style={styles.itemText}>Available Money: {item.availableAmount}</Text>
+                  <Text style={styles.itemText}>Available Money: {parseInt(item.availableAmount) }</Text>
+                  <Text style={styles.itemText}>{item.id}</Text>
                 </View>
+                <View>
+                  <TextInput 
+                  value={email} 
+                  onChange={setEmail} 
+                  placeholder="Enter User Email: ">
+
+                  </TextInput>
+                  <TextInput 
+                  value={availableAmount} 
+                  onChangeText={setAvailableAmount} 
+                  placeholder="How much do you wish to send: ">
+
+                  </TextInput>
+                </View>
+            
             </Pressable>
+            
           )}
       />
+      <TouchableOpacity  onPress={updateData}>
+            <Text>Add</Text>
+      </TouchableOpacity>
     </View>
   )
 }
