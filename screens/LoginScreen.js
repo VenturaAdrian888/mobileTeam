@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/core'
 import React, { useEffect, useState } from 'react'
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 // import { auth } from '../firebase'
-import { firebase } from '../firebase'
+import { auth, firebase } from '../firebase'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateCurrentUser  } from "firebase/auth";
 import { updateDoc, doc , setDoc } from 'firebase/firestore';
 
@@ -10,9 +10,9 @@ import { updateDoc, doc , setDoc } from 'firebase/firestore';
 
 const LoginScreen = () => {
   const todoRef = firebase.firestore().collection('Users');
-  const auth = getAuth();
+  
   const navigation = useNavigation()
-  const get = auth.currentUser
+ 
   
   const db = firebase.firestore();
   const [email, setEmail] = useState('')
@@ -24,7 +24,7 @@ const LoginScreen = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
-        navigation.navigate("Main")
+        navigation.replace("Main")
       }
     })
 
@@ -33,36 +33,13 @@ const LoginScreen = () => {
 
 //sign up 
   const handleSignUp = async () => {
-    const querySnapshot = await todoRef.get();
-    const users = [email];
-      querySnapshot.forEach((documentSnapshot)=>{
-          const userdata = documentSnapshot.data();
-      })
-
-    if (email.length == 0) {
-      alert("Please Enter Email");
-    }
-    //validate if meron ng existing user
-    // else if ('auth/email-already-in-use'){
-    //   alert("Email is already used")
-    // }
-    else if  (password.length == 0){
-      alert("Please Enter Password")
-    }
-    
-    else{
-      todoRef
+      auth
       createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredentials) => {
+      .then(userCredentials => {
         const user = userCredentials.user;
       
         console.log('Registered with:', user.uid);
 
-        const data ={
-          email: email,
-          password: password,
-          availableAmount: Number( availableAmount),
-        }
          setDoc(doc(db, "Users", user.uid),{
         email: email,
         password: password,
@@ -70,38 +47,19 @@ const LoginScreen = () => {
 
       })
 
-        // db
-        //     .collection('Users')
-        //     .doc(user.uid)
-        //     .add(data).then(()=>{
-        //       setEmail('');
-        //       setPassword('');
-        //       setAvailableAmount('0')
-        //     }).catch((error)=>{
-        //       alert(error)
-        //     })
-
-
-      }).catch((error)=>{
+      }).catch(error => alert(error.message))
        
-        console.log(error);
-      })
+        
      
       
-    }
+    
   }
 //Sign in..
 
 
 
   const handleLogin = () => {
-      
-
-    if(email.length == 0){
-      alert("Please Enter Email!");
-    }
-    
-    else {
+      auth
       signInWithEmailAndPassword(auth, email, password)
       .then(userCredentials => {
         const user = userCredentials.user;
@@ -110,7 +68,7 @@ const LoginScreen = () => {
       
       })
       .catch(error => alert(error.message))
-    }
+    
   };
 
 

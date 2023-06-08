@@ -14,11 +14,20 @@ const MainDashboard = () => {
     navigation.navigate("Send")
  }
  const onPress1 = () =>{
-  navigation.navigate("Dashboard")
+  auth
+    .signOut()
+    .then(() => {
+      navigation.replace("Login")
+    })
+    .catch(error => alert(error.message))
 }
 const onPress2 = () => {
   navigation.navigate("Profile")
 }
+const onPress3 = () => {
+  navigation.navigate("Recieve")
+}
+
 
 
 const pass = auth.currentUser
@@ -26,8 +35,8 @@ const uid = pass.uid
 const [current , setCurrent] = useState('')
 const todoRef = firebase.firestore().collection('Users');
 
-
-useEffect (() => {
+//fetch data(availableAmount) once
+ const loadData = () => {
   todoRef
   .doc(uid)
   .get()
@@ -39,7 +48,10 @@ useEffect (() => {
       setCurrent(documentSnapshot.data());
     }
   })
-})
+ }
+useEffect (() => {
+  loadData();
+},[])
 
 
 
@@ -79,7 +91,7 @@ useEffect (() => {
           <Text style={[styles.titleText, { color: 'black' }]}>Send</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.mediumButtonContainer} onPress={() => console.log('Receive button pressed')}>
+        <TouchableOpacity style={styles.mediumButtonContainer} onPress={onPress3}>
           <View style={styles.circleContainer}>
             <View style={styles.circle}>
               <Ionicons name="cash-outline" size={20} color="white" />
@@ -102,7 +114,7 @@ useEffect (() => {
         </View>
 
         <View style={{ marginRight: 10 }}>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => console.log('Logout button pressed')}>
+          <TouchableOpacity style={{ alignItems: 'center' }} onPress={onPress1}>
             <View style={styles.smallButtonContainer}>
               <Ionicons name="log-out-outline" size={22} color="white" />
             </View>

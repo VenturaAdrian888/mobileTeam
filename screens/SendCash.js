@@ -2,36 +2,22 @@ import { View, Text, FlatList, StyleSheet, Pressable, TextInput, Button, Touchab
 import React ,{useState, useEffect} from 'react';
 import { auth, firebase } from '../firebase';
 import {collection, setDoc, doc, getDoc, querySnapshot, documentSnapshot, getDocs, snapshotEqual, onSnapshot} from 'firebase/firestore'
-import { db } from '../firebase'
-import { getAuth } from 'firebase/auth';
+
 
 const SendCash = () => {
   
   const user = auth.currentUser
   const ownid = user.uid
-  const userEmail = user.email
+  
     const todoRef = firebase.firestore().collection('Users');
-    const todoRefq = collection(db, "Users")
+
     const [ availableAmount1, setAvailableAmount1] = useState('')
     const [uid , setUid] = useState('')
-    const [current , setCurrent] = useState('')
     const [current1 , setCurrent1] = useState('')
-    const [form , setForm] = useState('')
+   
 
-    const [my, setMy] = useState('')
-
-    const getUser = () => {
+    const loadData = () => {
       todoRef
-      .doc(uid)
-      .get()
-      .then(documentSnapshot => {
-        console.log( 'user exixts: ', documentSnapshot.exists);
-    
-        if(documentSnapshot.exists){
-          console.log('User data: ', documentSnapshot.data());
-          setCurrent(documentSnapshot.data());
-
-            todoRef
             .doc(ownid)
             .get()
             .then(documentSnapshot => {
@@ -40,37 +26,32 @@ const SendCash = () => {
           setCurrent1(documentSnapshot.data());
               }
             })
-
-        }
-      })
     }
+    useEffect(()=>{
+      loadData();
+    },[])
 
     
     
-    useEffect(() => {
-      const fetchMyId = () => {
-        const myId =  firebase.auth().currentUser;
-        if(myId){
-          setMy(myId.uid)
-        }
-      }
-      fetchMyId();
-    },[])
       
     const updateData = () => {
         
-        todoRef
-        .doc(uid)
-        .update({                 // input                    // firebase
-          availableAmount:  Number(availableAmount1) + Number(current.availableAmount)
-        })
-        .then (() =>{ 
+        
+        
                       //input                             from fireabase
-          if (Number(availableAmount1) < Number(current1.availableAmount)){
+          if (Number(availableAmount1) < Number(current1.availableAmount) ){
             todoRef
-            .doc(ownid)
-            .update({             //from form                       //from fireabse
-              availableAmount:  Number(current1.availableAmount) - Number(availableAmount1)
+            .doc(uid)
+            .update({             //from input                        //from fireabse
+              availableAmount:  Number(availableAmount1) + Number(current1.availableAmount)
+            })
+            .then (() => {
+              todoRef
+              .doc(ownid)
+              .update({                 // input                    // firebase
+                availableAmount:  Number(current1.availableAmount) - Number(availableAmount1)
+              })
+              
             })
               console.log('You have sent: ',availableAmount1, "to", uid);
               alert('Succesfull Transacation')
@@ -80,11 +61,27 @@ const SendCash = () => {
               console.log('KULANG PERA MO PRE')
               alert('Insuficient funds')
             
-          }{
-              console.log('You have sent: ',availableAmount1, "to", uid);
-              alert('Succesfull Transacation')
-          }    
-        })
+          }else if (Number(availableAmount1) == Number(current1.availableAmount)){
+            todoRef
+            .doc(uid)
+            .update({             //from input                        //from fireabse
+              availableAmount:  Number(availableAmount1) + Number(current1.availableAmount)
+            })
+            .then (() => {
+              todoRef
+              .doc(ownid)
+              .update({                 // input                    // firebase
+                availableAmount:  Number(current1.availableAmount) - Number(availableAmount1)
+              })
+              
+            })
+            console.log('You have sent: ',availableAmount1, "to", uid);
+            alert('Succesfull Transacation')
+          
+        }
+              
+              
+        
       };
 
       
@@ -100,7 +97,7 @@ const SendCash = () => {
     <View style= {styles.inputContainer}> 
 
         <View>
-            <Text>{ownid}</Text>
+            <Text>Wallet Balance: {current1.availableAmount}</Text>
             <TextInput 
                 value={uid} 
                 onChangeText={setUid}
@@ -117,9 +114,7 @@ const SendCash = () => {
             
             </View>
             <View>
-            <TouchableOpacity  onPress={getUser} style={styles.button}>
-                <Text style={styles.buttonText} >Validate User </Text>
-            </TouchableOpacity>
+            
             <TouchableOpacity  onPress={updateData} style={styles.button}>
                 <Text style={styles.buttonText} >Send </Text>
             </TouchableOpacity>

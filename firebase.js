@@ -7,14 +7,14 @@ import 'firebase/compat/firestore'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyB5xOJtmpNo91wYWedJZ50jO0Cyb4O4zPQ",
-  authDomain: "digitalwallet-c7947.firebaseapp.com",
-  projectId: "digitalwallet-c7947",
-  storageBucket: "digitalwallet-c7947.appspot.com",
-  messagingSenderId: "295763810520",
-  appId: "1:295763810520:web:47e4b79485c18160af5fad",
-  measurementId: "G-N7C7LPV6W9"
-};
+  apiKey: "AIzaSyCr9Fyaz1-w9-NKhwNNODcGOF7hRMnjuMQ",
+  authDomain: "digitalwallet-4672b.firebaseapp.com",
+  projectId: "digitalwallet-4672b",
+  storageBucket: "digitalwallet-4672b.appspot.com",
+  messagingSenderId: "651585453330",
+  appId: "1:651585453330:web:d6bd360f4e685b6db8c7cb",
+  measurementId: "G-WLQSVELYEL"
+}
 
 // Initialize Firebase
 if (!firebase.apps.length) {
