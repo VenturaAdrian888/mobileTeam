@@ -39,7 +39,7 @@ const Dashboard = () => {
       todoRef
       .doc(asd)
       .update({
-        availableAmount: Number(availableAmount),
+        availableAmount:+Number(availableAmount),
       })
       .then (() =>{
         console.log(availableAmount);

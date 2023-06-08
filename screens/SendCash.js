@@ -1,70 +1,79 @@
 import { View, Text, FlatList, StyleSheet, Pressable, TextInput, Button, Touchable, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import React ,{useState, useEffect} from 'react';
 import { auth, firebase } from '../firebase';
-import {collection, setDoc, doc, getDoc, querySnapshot, DocumentSnapshot} from 'firebase/firestore'
+import {collection, setDoc, doc, getDoc, querySnapshot, documentSnapshot, getDocs, snapshotEqual, onSnapshot} from 'firebase/firestore'
 import { db } from '../firebase'
+import { getAuth } from 'firebase/auth';
 
 const SendCash = () => {
-
+  
+  const user = auth.currentUser
+  const ownid = user.uid
+  const userEmail = user.email
     const todoRef = firebase.firestore().collection('Users');
-    const todoRefq = firebase.firestore().collection('Users').doc(uid);
-    const [ availableAmount, setAvailableAmount] = useState('')
+    const todoRefq = collection(db, "Users")
+    const [ availableAmount1, setAvailableAmount1] = useState('')
     const [uid , setUid] = useState('')
-    const [current , setCurrent] = useState([])
+    const [current , setCurrent] = useState('')
     const asd = 'ASGyWwAwDVgr6OBsBEYw'
 
-    const returnValue = () => {
-      todoRef
-      .doc(firebase.auth().currentUser.uid)
-      .get()
-      .then((snapshot) => {
-        if (snapshot.exists){
-          setCurrent(snapshot.data());
+    const [my, setMy] = useState('')
 
-        }else {
-          alert('aasd')
+    const getUser = () => {
+      todoRef
+      .doc(uid)
+      .get()
+      .then(documentSnapshot => {
+        console.log( 'user exixts: ', documentSnapshot.exists);
+    
+        if(documentSnapshot.exists){
+          console.log('User data: ', documentSnapshot.data());
+          setCurrent(documentSnapshot.data());
         }
       })
+
     }
+
     
-    // const returnValue = () => {
-    //     useEffect(() => {
-    //         ref('Users', asd);
-    //     }, [])
-    // }
-    // const ref = async(Users, asd) =>{
-    //     const documentSnapshot = await firestore()
-    //     .collection(Users)
-    //     .doc(asd)
-    //     .get()
-
-    //     if(documentSnapshot.exists){
-    //         const data = documentSnapshot.data();
-    //         setCurrent(data);
-    //     }
-    // }
-
+    
+    useEffect(() => {
+      const fetchMyId = () => {
+        const myId =  firebase.auth().currentUser;
+        if(myId){
+          setMy(myId.uid)
+        }
+      }
+      fetchMyId();
+    },[])
+      
     const updateData = () => {
-       
-
+        
         todoRef
         .doc(uid)
         .update({
-          availableAmount:  Number(availableAmount + cur) 
+          availableAmount:  Number(availableAmount1) + Number(current.availableAmount)
+          
         })
         .then (() =>{
-          console.log(availableAmount);
+          console.log('You have sent: ',availableAmount1, "to", uid);
+          alert('Succesfull Transacation')
         })
       };
+
+      
+
+ 
 
   return (
     <KeyboardAvoidingView
     style={styles.container}
       behavior="padding"
     >
-    <View style= {styles.inputContainer}>
-    
+  
+    <View style= {styles.inputContainer}> 
+
         <View>
+            <Text>{ownid}</Text>
             <TextInput 
                 value={uid} 
                 onChangeText={setUid}
@@ -72,17 +81,22 @@ const SendCash = () => {
                 style={styles.input}/>
                   
             <TextInput 
-                value={availableAmount} 
-                onChangeText={setAvailableAmount} 
+                value={availableAmount1} 
+                onChangeText={setAvailableAmount1} 
                 placeholder="How much do you wish to send: "
                 style={styles.input}
+                alert={'asdasd'}
             />
-            <Text>asdasd{current.password}</Text>
+            
             </View>
             <View>
+            <TouchableOpacity  onPress={getUser} style={styles.button}>
+                <Text style={styles.buttonText} >Validate User </Text>
+            </TouchableOpacity>
             <TouchableOpacity  onPress={updateData} style={styles.button}>
                 <Text style={styles.buttonText} >Send </Text>
             </TouchableOpacity>
+            
              </View>
             
             

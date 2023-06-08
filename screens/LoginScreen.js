@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 // import { auth } from '../firebase'
 import { firebase } from '../firebase'
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword  } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateCurrentUser  } from "firebase/auth";
+import { updateDoc } from 'firebase/firestore';
 
 
 
@@ -63,6 +64,7 @@ const LoginScreen = () => {
       createUserWithEmailAndPassword(auth, email, password)
       .then((userCredentials) => {
         const user = userCredentials.user;
+      
         console.log('Registered with:', user.email);
       }).catch((error)=>{
         const errorMessage = error.message;
@@ -86,6 +88,8 @@ const LoginScreen = () => {
       .then(userCredentials => {
         const user = userCredentials.user;
         console.log('Logged in with:', user.email);
+        
+      
       })
       .catch(error => alert(error.message))
     }

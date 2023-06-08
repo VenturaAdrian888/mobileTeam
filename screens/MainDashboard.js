@@ -1,10 +1,12 @@
 import { View, Text, FlatList, StyleSheet, Pressable, TouchableOpacity, Button } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { auth, firebase } from '../firebase';
-import { collection, setDoc, doc, getDoc } from 'firebase/firestore'
+import { collection, setDoc, doc, getDoc, Firestore } from 'firebase/firestore'
 import { db } from '../firebase'
 import { useNavigation } from '@react-navigation/core'
 import { Ionicons } from "@expo/vector-icons"
+import { getAuth } from 'firebase/auth';
+
 
 const MainDashboard = () => {
     const navigation = useNavigation()
@@ -18,6 +20,28 @@ const onPress2 = () => {
   navigation.navigate("Profile")
 }
 
+const auth = getAuth();
+const pass = auth.currentUser
+const uid = pass.uid
+const [current , setCurrent] = useState('')
+const todoRef = firebase.firestore().collection('Users');
+
+const getUser = () => {
+  todoRef
+  .doc(uid)
+  .get()
+  .then(documentSnapshot => {
+    console.log( 'user exixts: ', documentSnapshot.exists);
+
+    if(documentSnapshot.exists){
+      console.log('User data: ', documentSnapshot.data());
+      setCurrent(documentSnapshot.data());
+    }
+  })
+
+}
+
+
   return (
     <View style={styles.container}>
 
@@ -26,7 +50,7 @@ const onPress2 = () => {
           <Text style={styles.titleText}>
             Balance
           </Text>
-          <Text style={styles.regularText}>$100.00</Text>
+          <Text style={styles.regularText}>{uid}</Text>
         </View>
         <TouchableOpacity
           onPress={() => { console.log('Balance refreshed') }} >
