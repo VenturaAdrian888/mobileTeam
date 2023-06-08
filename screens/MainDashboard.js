@@ -20,13 +20,14 @@ const onPress2 = () => {
   navigation.navigate("Profile")
 }
 
-const auth = getAuth();
+
 const pass = auth.currentUser
 const uid = pass.uid
 const [current , setCurrent] = useState('')
 const todoRef = firebase.firestore().collection('Users');
 
-const getUser = () => {
+
+useEffect (() => {
   todoRef
   .doc(uid)
   .get()
@@ -38,8 +39,9 @@ const getUser = () => {
       setCurrent(documentSnapshot.data());
     }
   })
+})
 
-}
+
 
 
   return (
@@ -50,7 +52,7 @@ const getUser = () => {
           <Text style={styles.titleText}>
             Balance
           </Text>
-          <Text style={styles.regularText}>{uid}</Text>
+          <Text style={styles.regularText}>{current.availableAmount}</Text>
         </View>
         <TouchableOpacity
           onPress={() => { console.log('Balance refreshed') }} >

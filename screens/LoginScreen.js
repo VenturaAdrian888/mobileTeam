@@ -4,7 +4,7 @@ import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, Vi
 // import { auth } from '../firebase'
 import { firebase } from '../firebase'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateCurrentUser  } from "firebase/auth";
-import { updateDoc } from 'firebase/firestore';
+import { updateDoc, doc , setDoc } from 'firebase/firestore';
 
 
 
@@ -12,10 +12,14 @@ const LoginScreen = () => {
   const todoRef = firebase.firestore().collection('Users');
   const auth = getAuth();
   const navigation = useNavigation()
+  const get = auth.currentUser
   
+  const db = firebase.firestore();
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [availableAmount, setAvailableAmount] = useState('0')
+
+
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
@@ -47,29 +51,43 @@ const LoginScreen = () => {
     }
     
     else{
-      const data ={
-        email: email,
-        password: password,
-        availableAmount: Number( availableAmount),
-         
-      }
-      todoRef // To Save inputed credentials in firestore
-          .add(data).then(()=>{
-            setEmail('');
-            setPassword('');
-            setAvailableAmount('0')
-          }).catch((error)=>{
-            alert(error)
-          })
+      todoRef
       createUserWithEmailAndPassword(auth, email, password)
       .then((userCredentials) => {
         const user = userCredentials.user;
       
-        console.log('Registered with:', user.email);
-      }).catch((error)=>{
-        const errorMessage = error.message;
-        console.log(errorMessage);
+        console.log('Registered with:', user.uid);
+
+        const data ={
+          email: email,
+          password: password,
+          availableAmount: Number( availableAmount),
+        }
+         setDoc(doc(db, "Users", user.uid),{
+        email: email,
+        password: password,
+        availableAmount: Number( availableAmount)
+
       })
+
+        // db
+        //     .collection('Users')
+        //     .doc(user.uid)
+        //     .add(data).then(()=>{
+        //       setEmail('');
+        //       setPassword('');
+        //       setAvailableAmount('0')
+        //     }).catch((error)=>{
+        //       alert(error)
+        //     })
+
+
+      }).catch((error)=>{
+       
+        console.log(error);
+      })
+     
+      
     }
   }
 //Sign in..

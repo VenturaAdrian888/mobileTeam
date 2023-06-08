@@ -15,7 +15,8 @@ const SendCash = () => {
     const [ availableAmount1, setAvailableAmount1] = useState('')
     const [uid , setUid] = useState('')
     const [current , setCurrent] = useState('')
-    const asd = 'ASGyWwAwDVgr6OBsBEYw'
+    const [current1 , setCurrent1] = useState('')
+    const [form , setForm] = useState('')
 
     const [my, setMy] = useState('')
 
@@ -29,9 +30,19 @@ const SendCash = () => {
         if(documentSnapshot.exists){
           console.log('User data: ', documentSnapshot.data());
           setCurrent(documentSnapshot.data());
+
+            todoRef
+            .doc(ownid)
+            .get()
+            .then(documentSnapshot => {
+              if(documentSnapshot.exists){
+                console.log('User data: ', documentSnapshot.data());
+          setCurrent1(documentSnapshot.data());
+              }
+            })
+
         }
       })
-
     }
 
     
@@ -50,13 +61,29 @@ const SendCash = () => {
         
         todoRef
         .doc(uid)
-        .update({
+        .update({                 // input                    // firebase
           availableAmount:  Number(availableAmount1) + Number(current.availableAmount)
-          
         })
-        .then (() =>{
-          console.log('You have sent: ',availableAmount1, "to", uid);
-          alert('Succesfull Transacation')
+        .then (() =>{ 
+                      //input                             from fireabase
+          if (Number(availableAmount1) < Number(current1.availableAmount)){
+            todoRef
+            .doc(ownid)
+            .update({             //from form                       //from fireabse
+              availableAmount:  Number(current1.availableAmount) - Number(availableAmount1)
+            })
+              console.log('You have sent: ',availableAmount1, "to", uid);
+              alert('Succesfull Transacation')
+            
+          } else if (Number(availableAmount1) > Number(current1.availableAmount)){
+           
+              console.log('KULANG PERA MO PRE')
+              alert('Insuficient funds')
+            
+          }{
+              console.log('You have sent: ',availableAmount1, "to", uid);
+              alert('Succesfull Transacation')
+          }    
         })
       };
 
