@@ -22,7 +22,7 @@ const MainDashboard = () => {
     .catch(error => alert(error.message))
 }
 const onPress2 = () => {
-  navigation.navigate("Profile")
+  navigation.navigate("CoinListScreen")
 }
 const onPress3 = () => {
   navigation.navigate("Recieve")
@@ -124,6 +124,7 @@ useEffect (() => {
       </View>
     </View>
   );
+
 };
 
 export default MainDashboard
