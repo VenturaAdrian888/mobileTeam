@@ -4,30 +4,19 @@ import { getCoinList, getMarketData } from '../CoinGeckoAPI';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ListItem from '../components/ListItem';
-import { FlatList } from 'react-native-web';
+import { FlatList } from 'react-native';
 
 
 
 const CoinListScreen = () => {
-  // const [coinList, setCoinList] = useState([]);
 
-  // useEffect(() => {
-  //   fetchCoinList();
-  // }, []);
-
-  // const fetchCoinList = async () => {
-  //   try {
-  //     const data = await getCoinList();
-  //     console.log(data); // Check the API response in the console
-  //     setCoinList(data);
-  //   } catch (error) {
-  //     console.error('Error fetching coin list:', error);
-  //   }
-  // };
-  
   const  [data, setData ] = useState([]);
   const [selectedCoinData, setSelectedCoinData] = useState(null);
-
+  
+  const openModal = (item) => {
+    // Your logic for opening the modal
+    console.log('Opening modal for item:', item);
+  };
   useEffect(() => {
     const fetchMarketData = async () => {
       const marketData = await getMarketData();
@@ -38,13 +27,7 @@ const CoinListScreen = () => {
   }, [])
 
   return (
-    // <View>
-    //   <Text>Coin List:</Text>
-    //   {coinList.map((coin) => (
-    //     <Text key={coin.id}>{coin.name}</Text>
-    //   ))}
-    //   <Text>coinList: {JSON.stringify(coinList)}</Text>
-    // </View>
+
     <SafeAreaView >
     <FlatList
       keyExtractor={(item) => item.id}
