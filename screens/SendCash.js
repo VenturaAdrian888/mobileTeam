@@ -137,8 +137,4 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> 620055a0c73f4989e2dce3f5dcbc26a51ddf24c3
