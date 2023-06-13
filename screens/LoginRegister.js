@@ -3,17 +3,17 @@ import React, { useEffect, useState } from 'react'
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 // import { auth } from '../firebase'
 import { auth, firebase } from '../firebase'
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateCurrentUser  } from "firebase/auth";
-import { updateDoc, doc , setDoc } from 'firebase/firestore';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateCurrentUser } from "firebase/auth";
+import { updateDoc, doc, setDoc } from 'firebase/firestore';
 
 
 
 const LoginScreen = () => {
   const todoRef = firebase.firestore().collection('Users');
-  
+
   const navigation = useNavigation()
- 
-  
+
+
   const db = firebase.firestore();
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -31,44 +31,37 @@ const LoginScreen = () => {
     return unsubscribe
   }, [])
 
-//sign up 
+  //sign up 
   const handleSignUp = async () => {
-      auth
-      createUserWithEmailAndPassword(auth, email, password)
+    auth
+    createUserWithEmailAndPassword(auth, email, password)
       .then(userCredentials => {
         const user = userCredentials.user;
-      
+
         console.log('Registered with:', user.uid);
 
-         setDoc(doc(db, "Users", user.uid),{
-        email: email,
-        password: password,
-        availableAmount: Number( availableAmount)
+        setDoc(doc(db, "Users", user.uid), {
+          email: email,
+          password: password,
+          availableAmount: Number(availableAmount)
 
-      })
+        })
 
       }).catch(error => alert(error.message))
-       
-        
-     
-      
-    
   }
-//Sign in..
-
-
+  //Sign in..
 
   const handleLogin = () => {
-      auth
-      signInWithEmailAndPassword(auth, email, password)
+    auth
+    signInWithEmailAndPassword(auth, email, password)
       .then(userCredentials => {
         const user = userCredentials.user;
         console.log('Logged in with:', user.email);
-        
-      
+
+
       })
       .catch(error => alert(error.message))
-    
+
   };
 
 
