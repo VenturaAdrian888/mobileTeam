@@ -1,7 +1,6 @@
 import axios from 'axios';
 import moment from 'moment';
 
-
 const formatSparkline = (numbers) => {
   const sevenDaysAgo = moment().subtract(7, 'days').unix();
   let formattedSparkline = numbers.map((item, index) => {

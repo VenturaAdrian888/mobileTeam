@@ -1,25 +1,19 @@
 import { useNavigation } from '@react-navigation/core'
 import React, { useEffect, useState } from 'react'
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-// import { auth } from '../firebase'
 import { auth, firebase } from '../firebase'
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateCurrentUser } from "firebase/auth";
 import { updateDoc, doc, setDoc } from 'firebase/firestore';
+import { Ionicons } from '@expo/vector-icons';
 
-
-
-const LoginScreen = () => {
+const Login = () => {
   const todoRef = firebase.firestore().collection('Users');
 
   const navigation = useNavigation()
 
-
   const db = firebase.firestore();
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [availableAmount, setAvailableAmount] = useState('0')
-
-
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
@@ -31,25 +25,9 @@ const LoginScreen = () => {
     return unsubscribe
   }, [])
 
-  //sign up 
-  const handleSignUp = async () => {
-    auth
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(userCredentials => {
-        const user = userCredentials.user;
-
-        console.log('Registered with:', user.uid);
-
-        setDoc(doc(db, "Users", user.uid), {
-          email: email,
-          password: password,
-          availableAmount: Number(availableAmount)
-
-        })
-
-      }).catch(error => alert(error.message))
+  const handleSignUp = () => {
+    navigation.navigate("Register")
   }
-  //Sign in..
 
   const handleLogin = () => {
     auth
@@ -64,90 +42,91 @@ const LoginScreen = () => {
 
   };
 
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior="padding"
-    >
+      behavior="height" >
+
+      <Text style={styles.headerText}> Welcome!</Text>
+      <Text> Sign in to continue! </Text>
+
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Email"
           value={email}
           onChangeText={text => setEmail(text)}
-          style={styles.input}
-        />
+          style={styles.input}>
+        </TextInput>
+
         <TextInput
           placeholder="Password"
           value={password}
           onChangeText={text => setPassword(text)}
           style={styles.input}
-          secureTextEntry
-        />
+          secureTextEntry />
       </View>
 
       <View style={styles.buttonContainer}>
+
         <TouchableOpacity
           onPress={handleLogin}
-          style={styles.button}
-        >
+          style={styles.button}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleSignUp}
-          style={[styles.button, styles.buttonOutline]}
-        >
-          <Text style={styles.buttonOutlineText}>Register</Text>
+
+        <TouchableOpacity onPress={handleSignUp}>
+          <Text style={{ fontWeight: "bold" }}>Don't have an account? Register now</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   )
 }
 
-export default LoginScreen
+export default Login
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'white',
   },
   inputContainer: {
-    width: '80%'
+    width: '70%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 20,
   },
   input: {
+    width: '100%',
     backgroundColor: 'white',
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 10,
     marginTop: 5,
+    borderWidth: 0.4
   },
   buttonContainer: {
-    width: '60%',
+    width: '70%',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 40,
+    gap: 10
   },
   button: {
-    backgroundColor: '#0782F9',
+    backgroundColor: '#2E7D32',
     width: '100%',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
   },
-  buttonOutline: {
-    backgroundColor: 'white',
-    marginTop: 5,
-    borderColor: '#0782F9',
-    borderWidth: 2,
+  headerText: {
+    color: 'black',
+    fontWeight: '700',
+    fontSize: 40,
+    textAlign: "center",
   },
   buttonText: {
     color: 'white',
-    fontWeight: '700',
-    fontSize: 16,
-  },
-  buttonOutlineText: {
-    color: '#0782F9',
     fontWeight: '700',
     fontSize: 16,
   },
