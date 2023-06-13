@@ -2,16 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { auth, firebase } from '../firebase';
 import { collection, setDoc, doc, getDoc, querySnapshot, documentSnapshot, getDocs, snapshotEqual, onSnapshot } from 'firebase/firestore';
+import { v4 as uuid } from 'uuid';
+
+const uuu = uuid();
+const uniqueId = uuu.slice(0,8)
+
+
 
 const SendCash = () => {
   const user = auth.currentUser;
   const ownid = user.uid;
 
   const todoRef = firebase.firestore().collection('Users');
-
+  const tra = firebase.firestore().collection('Transactions');
   const [availableAmount1, setAvailableAmount1] = useState('');
   const [uid, setUid] = useState('');
   const [current1, setCurrent1] = useState('');
+  const [ getUser, setGetUser] = useState("")
 
   const loadData = () => {
     todoRef
@@ -23,6 +30,7 @@ const SendCash = () => {
           setCurrent1(documentSnapshot.data());
         }
       });
+   
   };
 
   useEffect(() => {
@@ -31,20 +39,61 @@ const SendCash = () => {
 
   const updateData = () => {
 
+    //get inputed uid 
+    todoRef
+    .doc(uid)
+    .get()
+    .then(documentSnapshot => {
+      if (documentSnapshot.exists) {
+        // console.log('User data: ', documentSnapshot.data());
+        setGetUser(documentSnapshot.data());
+      }
+      });
+
     //input                               from firebase
-    if (Number(availableAmount1) < Number(current1.availableAmount)) {
+    if (Number(availableAmount1) < Number(getUser.availableAmount)) {
+      
+      
       todoRef
-        .doc(uid)
-        .update({           //input                         from firebase
-          availableAmount: Number(availableAmount1) + Number(current1.availableAmount)
-        })
-        .then(() => {
-          todoRef
-            .doc(ownid)
-            .update({           //input                         from firebase
-              availableAmount: Number(current1.availableAmount) - Number(availableAmount1)
-            });
-        });
+      .doc(uid) // inputedUser
+      .update({           //input                         from firebase
+        availableAmount: Number(availableAmount1) + Number(getUser.availableAmount)
+      })
+      .then(() => {
+
+        //pass CurrentAmount - SendedAmount
+        todoRef
+          .doc(ownid)
+          .update({           //fireabse                  from input
+            availableAmount: Number(current1.availableAmount) - Number(availableAmount1)
+          });
+
+        
+    });
+
+
+      
+          
+//insert data in transction collection ( sender and reciever infos)
+// tra
+// .doc(uniqueId)
+// .set({
+//   senderUID: ownid,
+//   senderName: current1.firstName,
+//   recieverUID: uid,
+//   recieverName: getUser.firstName,
+// })    
+// .then(() => {
+//   todoRef
+// .doc(ownid)
+// .collection('transaction')
+// .doc(uuu)
+// .set({
+//   transactionId: uniqueId
+// })
+// })
+
+
       console.log('You have sent: ', availableAmount1, 'to', uid);
       alert('Successful Transaction');
     } else if (Number(availableAmount1) > Number(current1.availableAmount)) {
@@ -71,6 +120,7 @@ const SendCash = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Send Cash</Text>
+      
       <View style={styles.inputContainer}>
         <Text style={styles.balanceText}>Wallet Balance: {current1.availableAmount}</Text>
         <TextInput
