@@ -1,20 +1,17 @@
-import { View, Text, FlatList, StyleSheet, Pressable, TextInput, Button, Touchable, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { auth, firebase } from '../firebase';
-import { collection, setDoc, doc, getDoc, querySnapshot, documentSnapshot, getDocs, snapshotEqual, onSnapshot } from 'firebase/firestore'
-
+import { collection, setDoc, doc, getDoc, querySnapshot, documentSnapshot, getDocs, snapshotEqual, onSnapshot } from 'firebase/firestore';
 
 const SendCash = () => {
-
-  const user = auth.currentUser
-  const ownid = user.uid
+  const user = auth.currentUser;
+  const ownid = user.uid;
 
   const todoRef = firebase.firestore().collection('Users');
 
-  const [availableAmount1, setAvailableAmount1] = useState('')
-  const [uid, setUid] = useState('')
-  const [current1, setCurrent1] = useState('')
-
+  const [availableAmount1, setAvailableAmount1] = useState('');
+  const [uid, setUid] = useState('');
+  const [current1, setCurrent1] = useState('');
 
   const loadData = () => {
     todoRef
@@ -25,141 +22,119 @@ const SendCash = () => {
           console.log('User data: ', documentSnapshot.data());
           setCurrent1(documentSnapshot.data());
         }
-      })
-  }
+      });
+  };
+
   useEffect(() => {
     loadData();
-  }, [])
-
+  }, []);
 
   const updateData = () => {
 
-    //input                             from fireabase
+    //input                               from firebase
     if (Number(availableAmount1) < Number(current1.availableAmount)) {
       todoRef
         .doc(uid)
-        .update({             //from input                        //from fireabse
+        .update({           //input                         from firebase
           availableAmount: Number(availableAmount1) + Number(current1.availableAmount)
         })
         .then(() => {
           todoRef
             .doc(ownid)
-            .update({                 // input                    // firebase
+            .update({           //input                         from firebase
               availableAmount: Number(current1.availableAmount) - Number(availableAmount1)
-            })
-
-        })
-      console.log('You have sent: ', availableAmount1, "to", uid);
-      alert('Succesfull Transacation')
-
+            });
+        });
+      console.log('You have sent: ', availableAmount1, 'to', uid);
+      alert('Successful Transaction');
     } else if (Number(availableAmount1) > Number(current1.availableAmount)) {
-
-      console.log('KULANG PERA MO PRE')
-      alert('Insuficient funds')
-
-    } else if (Number(availableAmount1) == Number(current1.availableAmount)) {
+      console.log('KULANG PERA MO PRE');
+      alert('Insufficient funds');
+    } else if (Number(availableAmount1) === Number(current1.availableAmount)) {
       todoRef
         .doc(uid)
-        .update({             //from input                        //from fireabse
+        .update({           //from input                      from firebase
           availableAmount: Number(availableAmount1) + Number(current1.availableAmount)
         })
         .then(() => {
           todoRef
             .doc(ownid)
-            .update({                 // input                    // firebase
+            .update({           //from input                      from firebase
               availableAmount: Number(current1.availableAmount) - Number(availableAmount1)
-            })
-
-        })
-      console.log('You have sent: ', availableAmount1, "to", uid);
-      alert('Succesfull Transacation')
-
+            });
+        });
+      console.log('You have sent: ', availableAmount1, 'to', uid);
+      alert('Successful Transaction');
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior="padding"
-    >
-
+    <View style={styles.container}>
+      <Text style={styles.headerText}>Send Cash</Text>
       <View style={styles.inputContainer}>
-
-        <View>
-          <Text>Wallet Balance: {current1.availableAmount}</Text>
-          <TextInput
-            value={uid}
-            onChangeText={setUid}
-            placeholder="Enter User Uid: "
-            style={styles.input} />
-
-          <TextInput
-            value={availableAmount1}
-            onChangeText={setAvailableAmount1}
-            placeholder="How much do you wish to send: "
-            style={styles.input}
-            alert={'asdasd'}
-          />
-
-        </View>
-        <View>
-
-          <TouchableOpacity onPress={updateData} style={styles.button}>
-            <Text style={styles.buttonText} >Send </Text>
-          </TouchableOpacity>
-
-        </View>
-
+        <Text style={styles.balanceText}>Wallet Balance: {current1.availableAmount}</Text>
+        <TextInput
+          value={uid}
+          onChangeText={setUid}
+          placeholder="Enter User UID"
+          style={styles.input}
+        />
+        <TextInput
+          value={availableAmount1}
+          onChangeText={setAvailableAmount1}
+          placeholder="How much do you wish to send"
+          style={styles.input}
+        />
       </View>
-    </KeyboardAvoidingView>
-  )
-}
+      <TouchableOpacity onPress={updateData} style={styles.button}>
+        <Text style={styles.buttonText}>Send</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
-export default SendCash
+export default SendCash;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   inputContainer: {
-    width: '80%'
+    width: '80%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  balanceText: {
+    fontSize: 16,
+    marginBottom: 10,
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: '#F2F2F2',
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 10,
-    marginTop: 5,
-  },
-  buttonContainer: {
-    width: '60%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 40,
+    marginBottom: 10,
   },
   button: {
     backgroundColor: '#0782F9',
-    width: '100%',
+    width: '80%',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
-  },
-  buttonOutline: {
-    backgroundColor: 'white',
-    marginTop: 5,
-    borderColor: '#0782F9',
-    borderWidth: 2,
   },
   buttonText: {
     color: 'white',
     fontWeight: '700',
     fontSize: 16,
   },
-  buttonOutlineText: {
-    color: '#0782F9',
-    fontWeight: '700',
-    fontSize: 16,
-  },
-})
+});
