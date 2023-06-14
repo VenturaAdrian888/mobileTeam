@@ -1,10 +1,11 @@
 import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { auth, firebase } from '../firebase';
-import { collection, doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, querySnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 import { getAuth } from 'firebase/auth';
 import { LinearGradient } from 'expo-linear-gradient';
+import moment from 'moment';
 
 const ReceiveCash = () => {
   const user = auth.currentUser;
@@ -14,6 +15,11 @@ const ReceiveCash = () => {
 
   const [balance, setBalance] = useState('');
   const [transactionHistory, setTransactionHistory] = useState([]);
+
+  const [users, setUsers] = useState([]);
+    const toRef = todoRef.doc(uid).collection('transaction');
+
+    const [date, setDate] = useState("")
 
   const loadData = () => {
     todoRef
@@ -25,46 +31,33 @@ const ReceiveCash = () => {
           setBalance(documentSnapshot.data());
         }
       });
-
-    // Fetch transaction history
-    // Replace the following with your own logic to fetch transaction history data
-    const fetchTransactionHistory = async () => {
-      try {
-        // Fetch transaction history data
-        const historyData = await fetchTransactionHistoryData();
-
-        // Set the transaction history state
-        setTransactionHistory(historyData);
-      } catch (error) {
-        console.error('Error fetching transaction history:', error);
-      }
-    };
-
-    fetchTransactionHistory();
   };
+
+  
 
   useEffect(() => {
-    loadData();
+    loadData()
+    toRef
+   .onSnapshot(
+    querySnapshot => {
+        const users = []
+        querySnapshot.forEach((doc) => {
+            const {amountSend,recieverName,senderName,timeStamp} = doc.data()
+            users.push({
+              amountSend,
+              recieverName,
+              senderName,
+              timeStamp
+              
+            })
+            
+        })
+        setUsers(users)
+    }
+   )
   }, []);
 
-  const fetchTransactionHistoryData = () => {
-    // Dito mo lagay logic 
-    // Example lang andito 
-    return [
-      { id: '1', title: 'Transaction 1', amount: 100 },
-      { id: '2', title: 'Transaction 2', amount: 200 },
-      { id: '3', title: 'Transaction 3', amount: 300 },
-      { id: '4', title: 'Transaction 4', amount: 400 },
-      { id: '5', title: 'Transaction 5', amount: 500 },
-    ];
-  };
 
-  const renderTransactionItem = ({ item }) => (
-    <View style={styles.transactionItem}>
-      <Text style={styles.transactionTitle}>{item.title}</Text>
-      <Text style={styles.transactionAmount}>${item.amount}</Text>
-    </View>
-  );
 
   const renderSeeAllButton = () => (
     <TouchableOpacity style={styles.seeAllButton}>
@@ -73,7 +66,11 @@ const ReceiveCash = () => {
   );
 
   return (
+
+    
     <View style={styles.container}>
+       
+        
       <View style={styles.header}>
         {/* Your header components here */}
       </View>
@@ -101,12 +98,21 @@ const ReceiveCash = () => {
           </View>
           <Text style={styles.title}>Transaction History</Text>
         </LinearGradient>
-        <FlatList
-          data={transactionHistory}
-          renderItem={renderTransactionItem}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.transactionHistoryContainer}
-        />
+        <View>
+            <FlatList
+              data={users}
+              numColumns={1}
+              renderItem={({item}) => (
+                <View style={styles.transactionItem}>
+                    
+                  <Text style={styles.transactionTitle}>Time: {new Date(item.timeStamp.seconds*1000).toDateString()} {new Date(item.timeStamp.seconds*1000).toLocaleTimeString()} </Text>
+                    <Text style={styles.transactionAmount}>{item.senderName} sent ${item.amountSend} to {item.recieverName}</Text>
+                </View>
+              )}
+            />
+        </View>
+        
+        
         {renderSeeAllButton()}
       </View>
     </View>

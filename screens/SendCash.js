@@ -16,6 +16,7 @@ const SendCash = () => {
 
   const todoRef = firebase.firestore().collection('Users');
   const tra = firebase.firestore().collection('Transactions');
+  
   const [availableAmount1, setAvailableAmount1] = useState("");
   const [uid, setUid] = useState("");
   const [current1, setCurrent1] = useState("");
@@ -23,7 +24,7 @@ const SendCash = () => {
   const [refreshkey, setRefreshkey] = useState("")
   const navigation = useNavigation()
 
-  
+  const timestamp = new Date().toLocaleString()
 
   const reload = () => {
       navigation.navigate("Main")
@@ -51,6 +52,8 @@ const SendCash = () => {
   const upData = async () =>{
     const sfDocRef = todoRef.doc(uid);
     const rfDocRef = todoRef.doc(ownid);
+    const tran = todoRef.doc(ownid).collection('transaction')
+    const his = rfDocRef.collection('transaction')
     try{
       await runTransaction( db , async (trans) => {
         const sfDoc = await trans.get(sfDocRef)
@@ -74,13 +77,25 @@ const SendCash = () => {
           }             //current data of  sender           input
           const rr = rfDoc.data().availableAmount - Number(availableAmount1)
           trap.update(rfDocRef, {availableAmount: rr}) 
+       
+
+          rfDocRef
+          .collection('transaction')
+          .add({
+            senderName: rfDoc.data().firstName,
+            senderUid: ownid,
+            recieverName: sfDoc.data().firstName,
+            recieverUid: uid,
+            timeStamp: firebase.firestore.FieldValue.serverTimestamp(),
+            amountSend: Number(availableAmount1)
+              })              
+           
         })
 
-        tra
-        .doc(uniqueId)
-        .set({senderName: current1.firstNamae})
-      
-          
+        
+        
+
+        
         
         }     
       })

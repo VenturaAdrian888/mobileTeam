@@ -7,6 +7,7 @@ import Profile from './screens/Profile';
 import SendCash from './screens/SendCash';
 import ReceiveCash from './screens/ReceiveCash';
 import CoinListScreen from './screens/CoinList';
+import Try from './screens/Try';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +22,7 @@ export default function App() {
         <Stack.Screen name="Receive" component={ReceiveCash} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="CoinListScreen" component={CoinListScreen} />
+        <Stack.Screen name="Try" component={Try} />
       </Stack.Navigator>
     </NavigationContainer>
   );
