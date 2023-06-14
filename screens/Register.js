@@ -140,14 +140,15 @@ const styles = StyleSheet.create({
         borderWidth: 0.4
     },
     inputName: {
+        width: "100%",
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: "white",
         paddingHorizontal: 15,
         paddingVertical: 10,
         borderRadius: 10,
         marginTop: 5,
-        borderWidth: 0.4
-    },
+        borderWidth: 0.4,
+      },
     buttonContainer: {
         width: '70%',
         justifyContent: 'center',

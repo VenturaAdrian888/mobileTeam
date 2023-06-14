@@ -11,7 +11,7 @@ const Login = () => {
 
   const navigation = useNavigation()
 
-  const db = firebase.firestore();
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -53,6 +53,7 @@ const Login = () => {
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Email"
+          
           value={email}
           onChangeText={text => setEmail(text)}
           style={styles.input}>
@@ -60,6 +61,7 @@ const Login = () => {
 
         <TextInput
           placeholder="Password"
+          
           value={password}
           onChangeText={text => setPassword(text)}
           style={styles.input}

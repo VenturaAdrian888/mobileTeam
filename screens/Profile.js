@@ -13,6 +13,8 @@ export default function Profile() {
     // Handle the click event for each card
   };
 
+  
+
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

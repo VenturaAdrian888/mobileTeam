@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { auth, firebase } from '../firebase';
-import { collection, setDoc, doc, getDoc, querySnapshot, documentSnapshot, getDocs, snapshotEqual, onSnapshot } from 'firebase/firestore';
+import { auth, db, firebase } from '../firebase';
+import { collection, setDoc, doc, getDoc, querySnapshot, documentSnapshot, getDocs, snapshotEqual, onSnapshot, runTransaction } from 'firebase/firestore';
 import { v4 as uuid } from 'uuid';
+import { useNavigation } from '@react-navigation/core'
 
 const uuu = uuid();
 const uniqueId = uuu.slice(0,8)
@@ -15,10 +16,19 @@ const SendCash = () => {
 
   const todoRef = firebase.firestore().collection('Users');
   const tra = firebase.firestore().collection('Transactions');
-  const [availableAmount1, setAvailableAmount1] = useState('');
-  const [uid, setUid] = useState('');
-  const [current1, setCurrent1] = useState('');
+  const [availableAmount1, setAvailableAmount1] = useState("");
+  const [uid, setUid] = useState("");
+  const [current1, setCurrent1] = useState("");
   const [ getUser, setGetUser] = useState("")
+  const [refreshkey, setRefreshkey] = useState("")
+  const navigation = useNavigation()
+
+  
+
+  const reload = () => {
+      navigation.navigate("Main")
+      navigation.navigate("Send")
+  }
 
   const loadData = () => {
     todoRef
@@ -37,85 +47,132 @@ const SendCash = () => {
     loadData();
   }, []);
 
-  const updateData = () => {
 
-    //get inputed uid 
-    todoRef
-    .doc(uid)
-    .get()
-    .then(documentSnapshot => {
-      if (documentSnapshot.exists) {
-        // console.log('User data: ', documentSnapshot.data());
-        setGetUser(documentSnapshot.data());
-      }
-      });
+  const upData = async () =>{
+    const sfDocRef = todoRef.doc(uid);
+    const rfDocRef = todoRef.doc(ownid);
+    try{
+      await runTransaction( db , async (trans) => {
+        const sfDoc = await trans.get(sfDocRef)
+        if(!sfDoc.exists()){
+          throw "Documnet does not exixts"
+        }              //current data of receiver        input
+       else if(Number(availableAmount1) > Number(current1.availableAmount)){
+          console.log('KULANG PERA MO PRE');
+          alert("Insufficient Funds")
+        }
+        else {
+          const ss = sfDoc.data().availableAmount + Number(availableAmount1)
+        trans.update(sfDocRef, {availableAmount: ss})
+        console.log("Transaction successfully committed!");
+        // window.location.reload(true)
 
-    //input                               from firebase
-    if (Number(availableAmount1) < Number(getUser.availableAmount)) {
-      
-      
-      todoRef
-      .doc(uid) // inputedUser
-      .update({           //input                         from firebase
-        availableAmount: Number(availableAmount1) + Number(getUser.availableAmount)
-      })
-      .then(() => {
+        await runTransaction(db, async (trap) => {
+          const rfDoc = await trap.get(rfDocRef)
+          if(!rfDoc.exists()){
+            throw "Documnet does not exixts"
+          }             //current data of  sender           input
+          const rr = rfDoc.data().availableAmount - Number(availableAmount1)
+          trap.update(rfDocRef, {availableAmount: rr}) 
+        })
 
-        //pass CurrentAmount - SendedAmount
-        todoRef
-          .doc(ownid)
-          .update({           //fireabse                  from input
-            availableAmount: Number(current1.availableAmount) - Number(availableAmount1)
-          });
-
-        
-    });
-
-
+        tra
+        .doc(uniqueId)
+        .set({senderName: current1.firstNamae})
       
           
-//insert data in transction collection ( sender and reciever infos)
-// tra
-// .doc(uniqueId)
-// .set({
-//   senderUID: ownid,
-//   senderName: current1.firstName,
-//   recieverUID: uid,
-//   recieverName: getUser.firstName,
-// })    
-// .then(() => {
-//   todoRef
-// .doc(ownid)
-// .collection('transaction')
-// .doc(uuu)
-// .set({
-//   transactionId: uniqueId
-// })
-// })
+        
+        }     
+      })
 
-
-      console.log('You have sent: ', availableAmount1, 'to', uid);
-      alert('Successful Transaction');
-    } else if (Number(availableAmount1) > Number(current1.availableAmount)) {
-      console.log('KULANG PERA MO PRE');
-      alert('Insufficient funds');
-    } else if (Number(availableAmount1) === Number(current1.availableAmount)) {
-      todoRef
-        .doc(uid)
-        .update({           //from input                      from firebase
-          availableAmount: Number(availableAmount1) + Number(current1.availableAmount)
-        })
-        .then(() => {
-          todoRef
-            .doc(ownid)
-            .update({           //from input                      from firebase
-              availableAmount: Number(current1.availableAmount) - Number(availableAmount1)
-            });
-        });
-      console.log('You have sent: ', availableAmount1, 'to', uid);
-      alert('Successful Transaction');
+    } catch (e) {
+      console.log("Transaction failed: ", e);
     }
-  };
+  
+  }
+  
+ const handle = () => {
+     reload();
+     upData();
+    }
+    
+
+
+
+  // const updateData = async () => {
+
+  //   //get inputed uid 
+  //   todoRef
+  //   .doc(uid)
+  //   .get()
+  //   .then(documentSnapshot => {
+  //     if (documentSnapshot.exists) {
+  //       // console.log('User data: ', documentSnapshot.data());
+  //       setGetUser(documentSnapshot.data());
+  //     }
+  //     });
+
+  //             // input                               from firebase
+  //   if (Number(availableAmount1) < Number(getUser.availableAmount)) {
+  //     todoRef
+  //     .doc(uid) // to reciever
+  //     .update({           //input                         from firebase
+  //       availableAmount: Number(availableAmount1) + Number(getUser.availableAmount)
+  //     })
+  //     .then(() => {
+
+  //       //for sender
+  //       todoRef
+  //         .doc(ownid)
+  //         .update({           //fireabse                  from input
+  //           availableAmount: Number(current1.availableAmount) - Number(availableAmount1)
+  //         })
+
+  //   })
+  //   console.log('You have sent: ', availableAmount1, 'to', uid);
+  //     alert('Successful Transaction');
+      
+      
+
+  // }else if (Number(availableAmount1) > Number(getUser.availableAmount)){
+  //   todoRef
+  //     .doc(uid) // to reciever
+  //     .update({           //input                         from firebase
+  //       availableAmount: Number(availableAmount1) + Number(getUser.availableAmount)
+  //     })
+  //     .then(() => {
+
+  //       //for sender
+  //       todoRef
+  //         .doc(ownid)
+  //         .update({           //fireabse                  from input
+  //           availableAmount: Number(current1.availableAmount) - Number(availableAmount1)
+  //         })
+
+  //   })
+  //   console.log('You have sent: ', availableAmount1, 'to', uid);
+  //     alert('Successful Transaction');
+      
+  // }else if (Number(availableAmount1) > Number(current1.availableAmount)) {
+  //     console.log('KULANG PERA MO PRE');
+  //     alert('Insufficient funds');
+  //   } else if (Number(availableAmount1) === Number(current1.availableAmount)) {
+  //     todoRef
+  //       .doc(uid)
+  //       .update({           //from input                      from firebase
+  //         availableAmount: Number(availableAmount1) + Number(current1.availableAmount)
+  //       })
+  //       .then(() => {
+  //         todoRef
+  //           .doc(ownid)
+  //           .update({           //from input                      from firebase
+  //             availableAmount: Number(current1.availableAmount) - Number(availableAmount1)
+  //           });
+  //       });
+  //     console.log('You have sent: ', availableAmount1, 'to', uid);
+  //     alert('Successful Transaction');
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
@@ -131,12 +188,13 @@ const SendCash = () => {
         />
         <TextInput
           value={availableAmount1}
+
           onChangeText={setAvailableAmount1}
           placeholder="How much do you wish to send"
           style={styles.input}
         />
       </View>
-      <TouchableOpacity onPress={updateData} style={styles.button}>
+      <TouchableOpacity onPress={handle} style={styles.button}>
         <Text style={styles.buttonText}>Send</Text>
       </TouchableOpacity>
     </View>

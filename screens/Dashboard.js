@@ -15,6 +15,7 @@ const Dashboard = () => {
     navigation.navigate("Send")
   }
 
+
   const receive = () => {
     navigation.navigate("Receive")
   }
@@ -52,11 +53,14 @@ const Dashboard = () => {
         if (documentSnapshot.exists) {
           console.log('User data: ', documentSnapshot.data());
           setCurrent(documentSnapshot.data());
+          
+          
         }
       })
   }
   useEffect(() => {
     loadData();
+    
   }, [])
 
   return (
