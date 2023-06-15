@@ -1,202 +1,242 @@
-import { View, Text, FlatList, StyleSheet, Pressable, TouchableOpacity, Button } from 'react-native';
-import React, { useState, useEffect } from 'react';
-import { auth, firebase } from '../firebase';
-import { collection, setDoc, doc, getDoc, Firestore } from 'firebase/firestore'
-import { db } from '../firebase'
-import { useNavigation } from '@react-navigation/core'
-import { Ionicons } from "@expo/vector-icons"
-import { getAuth } from 'firebase/auth';
-
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Pressable,
+  TouchableOpacity,
+  Button,
+} from "react-native";
+import React, { useState, useEffect } from "react";
+import { auth, firebase } from "../firebase";
+import { getAuth, updateProfile } from "firebase/auth";
+import { collection, setDoc, doc, getDoc, Firestore } from "firebase/firestore";
+import { db } from "../firebase";
+import { useNavigation } from "@react-navigation/core";
+import { Ionicons } from "@expo/vector-icons";
 
 const Dashboard = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   const send = () => {
-    navigation.navigate("Send")
-  }
+    navigation.navigate("Send");
+  };
 
-
-  const receive = () => {
-    navigation.navigate("Receive")
-  }
+  const transactionHistory = () => {
+    navigation.navigate("TransactionHistory");
+  };
 
   const profile = () => {
-    navigation.navigate("Profile")
-  }
+    navigation.navigate("Profile");
+  };
 
   const coinsList = () => {
-    navigation.navigate("CoinListScreen")
-  }
+    navigation.navigate("CoinListScreen");
+  };
 
   const logout = () => {
     auth
       .signOut()
       .then(() => {
-        navigation.replace("Login")
+        navigation.replace("Login");
       })
-      .catch(error => alert(error.message))
-  }
+      .catch((error) => alert(error.message));
+  };
 
-  const pass = auth.currentUser
-  const uid = pass.uid
-  const [current, setCurrent] = useState('')
-  const todoRef = firebase.firestore().collection('Users');
+  const pass = auth.currentUser;
+  const uid = pass.uid;
+  const [current, setCurrent] = useState("");
+  const todoRef = firebase.firestore().collection("Users");
 
   //fetch data(availableAmount) once
   const loadData = () => {
     todoRef
       .doc(uid)
       .get()
-      .then(documentSnapshot => {
-        console.log('user exixts: ', documentSnapshot.exists);
+      .then((documentSnapshot) => {
+        console.log("user exixts: ", documentSnapshot.exists);
 
         if (documentSnapshot.exists) {
-          console.log('User data: ', documentSnapshot.data());
+          console.log("User data: ", documentSnapshot.data());
           setCurrent(documentSnapshot.data());
-          
-          
         }
-      })
-  }
+      });
+  };
   useEffect(() => {
     loadData();
-    
-  }, [])
+  }, []);
 
   return (
     <View style={styles.container}>
-
-      <View style={[styles.header, { flexDirection: 'row', justifyContent: 'space-between', }]}>
+      <View
+        style={[
+          styles.header,
+          { flexDirection: "row", justifyContent: "space-between" },
+        ]}
+      >
         <View>
-          <Text style={styles.titleText}>
-            Balance
-          </Text>
+          <Text style={styles.titleText}>Balance</Text>
           <Text style={styles.regularText}>{current.availableAmount}</Text>
         </View>
-        <TouchableOpacity
-          onPress={() => { console.log('Balance refreshed') }} >
+        <TouchableOpacity onPress={() => {}}>
           <Ionicons name="reload-outline" size={15} color="white" />
         </TouchableOpacity>
       </View>
 
       <View
         style={{
-          borderBottomColor: 'lightgray',
+          borderBottomColor: "lightgray",
           borderBottomWidth: StyleSheet.hairlineWidth,
           margin: 20,
         }}
       />
 
-      <View style={styles.buttonsContainer}  >
-
+      <View style={styles.buttonsContainer}>
         <TouchableOpacity style={styles.mediumButtonContainer} onPress={send}>
           <View style={styles.circleContainer}>
             <View style={styles.circle}>
               <Ionicons name="send" size={20} color="white" />
             </View>
           </View>
-          <Text style={[styles.titleText, { color: 'black' }]}>Send</Text>
+          <Text style={[styles.titleText, { color: "black" }]}>Send</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.mediumButtonContainer} onPress={receive}>
+        <TouchableOpacity
+          style={styles.mediumButtonContainer}
+          onPress={console.log("pressed")}
+        >
+          <View style={styles.circleContainer}>
+            <View style={styles.circle}>
+              <Ionicons name="qr-code-outline" size={20} color="white" />
+            </View>
+          </View>
+          <Text style={[styles.titleText, { color: "black" }]}>Scan</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.mediumButtonContainer}
+          onPress={console.log("pressed")}
+        >
           <View style={styles.circleContainer}>
             <View style={styles.circle}>
               <Ionicons name="cash-outline" size={20} color="white" />
             </View>
           </View>
-          <Text style={styles.label}>Receive</Text>
+          <Text style={styles.label}>Top up</Text>
         </TouchableOpacity>
       </View>
 
       <Text style={styles.HeadlineText}>Shortcuts</Text>
 
-      <View style={[styles.buttonsContainer, { justifyContent: 'flex-start' }]}>
-
+      <View style={[styles.buttonsContainer, { justifyContent: "flex-start" }]}>
         <View>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={profile}>
+          <TouchableOpacity style={{ alignItems: "center" }} onPress={profile}>
             <View style={styles.smallButtonContainer}>
               <Ionicons name="person-outline" size={22} color="white" />
             </View>
-            <Text style={[styles.titleText, { color: 'black', marginTop: 5 }]}>Profile</Text>
+            <Text style={[styles.titleText, { color: "black", marginTop: 5 }]}>
+              Profile
+            </Text>
           </TouchableOpacity>
         </View>
 
         <View>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={coinsList}>
+          <TouchableOpacity
+            style={{ alignItems: "center" }}
+            onPress={coinsList}
+          >
             <View style={styles.smallButtonContainer}>
               <Ionicons name="logo-bitcoin" size={22} color="white" />
             </View>
-            <Text style={[styles.titleText, { color: 'black', marginTop: 5 }]}>Crypto</Text>
+            <Text style={[styles.titleText, { color: "black", marginTop: 5 }]}>
+              Crypto
+            </Text>
           </TouchableOpacity>
         </View>
 
         <View>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={logout}>
+          <TouchableOpacity
+            style={{ alignItems: "center" }}
+            onPress={transactionHistory}
+          >
+            <View style={styles.smallButtonContainer}>
+              <Ionicons name="list-outline" size={22} color="white" />
+            </View>
+            <Text style={[styles.titleText, { color: "black", marginTop: 5 }]}>
+              Transactions
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View>
+          <TouchableOpacity style={{ alignItems: "center" }} onPress={logout}>
             <View style={styles.smallButtonContainer}>
               <Ionicons name="log-out-outline" size={22} color="white" />
             </View>
-            <Text style={[styles.titleText, { color: 'black', marginTop: 5 }]}>Logout</Text>
+            <Text style={[styles.titleText, { color: "black", marginTop: 5 }]}>
+              Logout
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
     </View>
   );
-
 };
 
-export default Dashboard
+export default Dashboard;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: 'white',
+    padding: 20,
+    backgroundColor: "white",
   },
   header: {
     height: 120,
     padding: 20,
     borderRadius: 25,
-    alignItems: 'center',
-    backgroundColor: '#2ecc71',
+    alignItems: "center",
+    backgroundColor: "#2ecc71",
   },
   titleText: {
     fontSize: 12,
-    color: 'white',
+    color: "white",
   },
   HeadlineText: {
     fontSize: 12,
     marginBottom: 10,
-    color: 'gray'
+    color: "gray",
   },
   regularText: {
     fontSize: 30,
     color: "white",
+    fontWeight: 700,
   },
   buttonsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 20,
-    justifyContent: 'space-evenly',
-    gap: 20
+    justifyContent: "space-evenly",
+    gap: 20,
   },
   mediumButtonContainer: {
     height: 90,
     width: 90,
     padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
     borderRadius: 20,
-    alignContent: 'center',
-    flexWrap: 'wrap',
-    backgroundColor: '#EDf9EB'
+    alignContent: "center",
+    flexWrap: "wrap",
+    backgroundColor: "#EDf9EB",
   },
   circle: {
     width: 40,
     height: 40,
     borderRadius: 100,
-    backgroundColor: '#2E7D32',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#2E7D32",
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: 5,
   },
   smallButtonContainer: {
@@ -204,10 +244,10 @@ const styles = StyleSheet.create({
     width: 50,
     padding: 10,
     marginBottom10: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 10,
-    alignContent: 'center',
-    backgroundColor: 'green'
+    alignContent: "center",
+    backgroundColor: "green",
   },
 });
