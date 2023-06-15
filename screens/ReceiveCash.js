@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, FlatList, TouchableOpacity, SectionList, SafeAreaView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { auth, firebase } from '../firebase';
 import { collection, doc, getDoc, querySnapshot } from 'firebase/firestore';
@@ -14,12 +14,15 @@ const ReceiveCash = () => {
   const todoRef = firebase.firestore().collection('Users');
 
   const [balance, setBalance] = useState('');
-  const [transactionHistory, setTransactionHistory] = useState([]);
+ 
 
   const [users, setUsers] = useState([]);
-    const toRef = todoRef.doc(uid).collection('transaction');
+    const toRef = todoRef.doc(uid).collection('sendTransaction');
 
-    const [date, setDate] = useState("")
+const [users1, setUsers1] = useState([]);
+    const toReff = todoRef.doc(uid).collection('recieveTransaction');
+
+
 
   const loadData = () => {
     todoRef
@@ -33,28 +36,54 @@ const ReceiveCash = () => {
       });
   };
 
+  const sendTransaction = () =>{
+    toRef
+    .onSnapshot(
+     querySnapshot => {
+         const users = []
+         querySnapshot.forEach((doc) => {
+             const {amountSend,recieverName,senderName,timeStamp} = doc.data()
+             users.push({
+               amountSend,
+               recieverName,
+               senderName,
+               timeStamp
+               
+             })
+             
+         })
+         setUsers(users)
+     }
+    )
+  }
+
+  const recieveTransaction = () => {
+    toReff
+    .onSnapshot(
+      querySnapshot => {
+        const users1 = []
+        querySnapshot.forEach((doc1) => {
+          const {amountRecieve,recieverName,senderName,timeStamp} = doc1.data()
+          users1.push({
+            amountRecieve,
+            recieverName,
+            senderName,
+            timeStamp
+            
+          })
+          console.log(recieverName)
+        })
+        setUsers1(users1)
+      }
+    )
+  }
+
   
 
   useEffect(() => {
     loadData()
-    toRef
-   .onSnapshot(
-    querySnapshot => {
-        const users = []
-        querySnapshot.forEach((doc) => {
-            const {amountSend,recieverName,senderName,timeStamp} = doc.data()
-            users.push({
-              amountSend,
-              recieverName,
-              senderName,
-              timeStamp
-              
-            })
-            
-        })
-        setUsers(users)
-    }
-   )
+    sendTransaction()
+    recieveTransaction()
   }, []);
 
 
@@ -96,9 +125,26 @@ const ReceiveCash = () => {
               <Text style={styles.moneyIcon}>$</Text>
             </View>
           </View>
-          <Text style={styles.title}>Transaction History</Text>
+          
         </LinearGradient>
+      
         <View>
+
+        <SafeAreaView>
+        <Text style={styles.title}>Receive Transaction History</Text>
+            <FlatList
+              data={users1}
+              numColumns={2}
+              renderItem={({item}) => (
+                <View style={styles.transactionItem1}>
+                    
+                  <Text style={styles.transactionTitle}>Time: {new Date(item.timeStamp.seconds*1000).toDateString()} {new Date(item.timeStamp.seconds*1000).toLocaleTimeString()} </Text>
+                    <Text style={styles.transactionAmount}>{item.senderName} sent ${item.amountRecieve} to {item.recieverName}</Text>
+                </View>
+              )}
+            />
+
+        <Text style={styles.title}>Sent Transaction History</Text>
             <FlatList
               data={users}
               numColumns={1}
@@ -110,6 +156,8 @@ const ReceiveCash = () => {
                 </View>
               )}
             />
+        </SafeAreaView>
+        
         </View>
         
         
@@ -196,7 +244,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
-    marginTop: 20,
+    marginTop: 50,
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -209,6 +257,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  transactionItem1: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'start',
     paddingHorizontal: 20,
     marginBottom: 10,
   },

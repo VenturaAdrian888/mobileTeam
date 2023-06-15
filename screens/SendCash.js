@@ -68,7 +68,6 @@ const SendCash = () => {
           const ss = sfDoc.data().availableAmount + Number(availableAmount1)
         trans.update(sfDocRef, {availableAmount: ss})
         console.log("Transaction successfully committed!");
-        // window.location.reload(true)
 
         await runTransaction(db, async (trap) => {
           const rfDoc = await trap.get(rfDocRef)
@@ -80,7 +79,7 @@ const SendCash = () => {
        
 
           rfDocRef
-          .collection('transaction')
+          .collection('sendTransaction')
           .add({
             senderName: rfDoc.data().firstName,
             senderUid: ownid,
@@ -88,7 +87,18 @@ const SendCash = () => {
             recieverUid: uid,
             timeStamp: firebase.firestore.FieldValue.serverTimestamp(),
             amountSend: Number(availableAmount1)
-              })              
+              })     
+              
+          sfDocRef
+          .collection('recieveTransaction')
+          .add({
+            senderName: sfDoc.data().firstName,
+            senderUid: ownid,
+            recieverName: sfDoc.data().firstName,
+            recieverUid: uid,
+            timeStamp: firebase.firestore.FieldValue.serverTimestamp(),
+            amountRecieve: Number(availableAmount1)
+        })
            
         })
 
