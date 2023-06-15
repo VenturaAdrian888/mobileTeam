@@ -139,7 +139,7 @@ const [users1, setUsers1] = useState([]);
                 <View style={styles.transactionItem1}>
                     
                   <Text style={styles.transactionTitle}>Time: {new Date(item.timeStamp.seconds*1000).toDateString()} {new Date(item.timeStamp.seconds*1000).toLocaleTimeString()} </Text>
-                    <Text style={styles.transactionAmount}>{item.senderName} sent ${item.amountRecieve} to {item.recieverName}</Text>
+                    <Text style={styles.transactionAmount}>{item.recieverName} recieved ${item.amountRecieve} from {item.senderName}</Text>
                 </View>
               )}
             />

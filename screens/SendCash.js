@@ -92,7 +92,7 @@ const SendCash = () => {
           sfDocRef
           .collection('recieveTransaction')
           .add({
-            senderName: sfDoc.data().firstName,
+            senderName: rfDoc.data().firstName,
             senderUid: ownid,
             recieverName: sfDoc.data().firstName,
             recieverUid: uid,
