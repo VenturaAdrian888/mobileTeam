@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Modal, TextInput, Button } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, Modal, TextInput, Button, Image, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { auth, firebase } from '../firebase';
-import { collection, setDoc, doc, getDoc, Firestore } from 'firebase/firestore'
+import { collection, setDoc, doc, getDoc, Firestore } from 'firebase/firestore';
 
 export default function Profile() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -57,15 +57,17 @@ export default function Profile() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Cash System</Text>
 
-      <View style={styles.userInfo}>
-        <Text style={styles.userName}>{current.firstName}</Text>
-        <Text style={styles.userName}>{current.lastName}</Text>
+      <View style={styles.profileContainer}>
+        <Image
+          source={require('../assets/profile-icon.jpg')}
+          style={styles.profileImage}
+        />
+        <Text style={styles.userName}>{current.firstName} {current.lastName}</Text>
         <Text style={styles.balance}>{current.availableAmount}</Text>
       </View>
 
-      <View style={styles.cardContainer}>
+      <ScrollView contentContainerStyle={styles.cardContainer}>
         <TouchableOpacity style={styles.card} onPress={() => handleCardPress('Card 1')}>
           <Ionicons name="ios-speedometer" size={60} color="white" />
           <Text style={styles.cardText}>Card 1</Text>
@@ -85,7 +87,7 @@ export default function Profile() {
           <Ionicons name="ios-person" size={60} color="white" />
           <Text style={styles.cardText}>Update Profile</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
 
       {/* Profile Update Modal */}
       <Modal visible={isModalVisible} animationType="slide">
@@ -97,14 +99,13 @@ export default function Profile() {
             value={firstName}
             onChangeText={(text) => setFirstName(text)}
           />
-          { <TextInput
+          <TextInput
             style={styles.input}
             placeholder="Last Name"
             value={lastName}
             onChangeText={(text) => setLastName(text)}
-          />}
+          />
 
-          
           <Button title="Save" onPress={updateProfile} />
           <Button title="Cancel" onPress={() => setIsModalVisible(false)} />
         </View>
@@ -120,12 +121,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F1F3F6',
   },
-  logoutButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    padding: 10,
-  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -133,8 +128,15 @@ const styles = StyleSheet.create({
     top: 10,
     left: 10,
   },
-  userInfo: {
+  profileContainer: {
+    alignItems: 'center',
     marginBottom: 20,
+  },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
   },
   userName: {
     fontSize: 28,
@@ -149,6 +151,7 @@ const styles = StyleSheet.create({
     color: '#555',
   },
   cardContainer: {
+    flexGrow: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
@@ -158,7 +161,7 @@ const styles = StyleSheet.create({
   card: {
     width: 150,
     height: 150,
-    backgroundColor: '#4F6D7A',
+    backgroundColor: '#2E7D32',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
