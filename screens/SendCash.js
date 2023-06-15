@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  FlatList,
 } from "react-native";
 import { auth, db, firebase } from "../firebase";
 import {
@@ -22,6 +23,7 @@ import {
 import { v4 as uuid } from "uuid";
 import { useNavigation } from "@react-navigation/core";
 import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const uuu = uuid();
 const uniqueId = uuu.slice(0, 8);
@@ -31,16 +33,16 @@ const SendCash = () => {
   const ownid = user.uid;
 
   const todoRef = firebase.firestore().collection("Users");
-  const tra = firebase.firestore().collection("Transactions");
+  const toReff = todoRef.doc(ownid).collection('sendTransaction');
+  const [users, setUsers] = useState([]);
+  const [selectedReceiver, setSelectedReceiver] = useState('');
 
   const [availableAmount1, setAvailableAmount1] = useState("");
   const [uid, setUid] = useState("");
   const [current1, setCurrent1] = useState("");
-  const [getUser, setGetUser] = useState("");
-  const [refreshkey, setRefreshkey] = useState("");
   const navigation = useNavigation();
 
-  const timestamp = new Date().toLocaleString();
+  
 
   const reload = () => {
     navigation.navigate("Dashboard");
@@ -58,9 +60,51 @@ const SendCash = () => {
       });
   };
 
+  const recieveTransaction = () => {
+    toReff
+    .onSnapshot(
+      querySnapshot => {
+        const users = {};
+        querySnapshot.forEach(doc => {
+          const { recieverUid, recieverName, timeStamp} = doc.data();
+
+          if(!users[recieverName]){
+            users[recieverName] = {
+              recieverName,
+              recieverUid,
+              timeStamp
+               }
+        }
+            else {
+                const existingTransaction = users[recieverName]
+                
+                if (timeStamp.toDate() > existingTransaction.timeStamp){
+                  users[recieverName] =  {
+                    recieverName,
+                    recieverUid,
+                    timeStamp
+                  }
+        }
+          }
+        })
+        const sort = Object.values(users).sort((a,b)=> b.timeStamp - a.timeStamp)
+        const re = sort.slice(0, 5)
+        setUsers(re)
+      }
+    )
+}
+
   useEffect(() => {
     loadData();
+    recieveTransaction();
   }, []);
+
+  const handleRecieverClick = (recieverUid)=>{
+    setUid(recieverUid);
+    setSelectedReceiver(recieverUid);
+  }
+
+
 
   const upData = async () => {
     const sfDocRef = todoRef.doc(uid);
@@ -115,9 +159,11 @@ const SendCash = () => {
   };
 
   const handle = () => {
-    reload();
     upData();
+    reload();
   };
+
+
 
   return (
     <View style={styles.container}>
@@ -126,7 +172,27 @@ const SendCash = () => {
 
         <View>
           <Text style={{ fontWeight: "bold" }}>Recent Contacts </Text>
-          <View style={styles.recentContactsContainer}></View>
+          <View style={styles.recentContactsContainer}>
+            <SafeAreaView>
+              <FlatList
+              data={users}
+              numColumns={5}
+              renderItem={({item}) => (
+        
+                <View>
+                  <TouchableOpacity onPress={() => handleRecieverClick(item.recieverUid)}>
+                  <View style={styles.itemContainer}>
+                    <Ionicons name="person" size={24} color="green" />
+                      <Text style={styles.itemText}>
+                        {item.recieverName} 
+                      </Text>
+                  </View>
+                  </TouchableOpacity>
+                </View>
+              )}
+              />
+            </SafeAreaView>
+          </View>
         </View>
 
         <View style={styles.inputContainer}>
@@ -136,6 +202,7 @@ const SendCash = () => {
             onChangeText={setUid}
             placeholder="Enter account number"
             style={styles.input}
+            
           />
           <Text style={{ fontWeight: "bold" }}>Amount</Text>
           <TextInput
@@ -175,7 +242,7 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     borderWidth: 0.4,
     borderRadius: 10,
-    height: 80,
+    height: 70,
     alignItems: "center",
     padding: 16,
   },
@@ -233,4 +300,15 @@ const styles = StyleSheet.create({
     flex: 1,
     width: undefined,
   },
+  itemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 20,
+  },
+  itemText: {
+    marginLeft: 12,
+  },
+  infos:{
+    marginTop:20
+  }
 });

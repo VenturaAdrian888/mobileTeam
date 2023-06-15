@@ -1,101 +1,104 @@
-import { View, Text, FlatList } from 'react-native'
-import React ,{useState, useEffect} from 'react';
-import { auth, db, firebase } from '../firebase';
-import {querySnapshot} from 'firebase/firestore';
-import { SectionList } from 'react-native-web';
-
-
+import React from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 
 const Try = () => {
-    const user = auth.currentUser;
-  const ownid = user.uid;
-
-
-    const [users, setUsers] = useState([]);
-    const [users12, setUsers12] = useState([]);
-    const todoRef = firebase.firestore().collection('Users').doc(ownid).collection('recieveTransaction');
-    const todo = firebase.firestore().collection('Users').doc(ownid).collection('sendTransaction');
-
-  
-    
-    
-  useEffect(() => {
-    todoRef
-    .onSnapshot(
-      querySnapshot => {
-        const users = []
-        querySnapshot.forEach((doc) => {
-          const {amountSend} = doc.data()
-          users.push({
-            amountSend,
-           
-          })
-          
-        })
-        setUsers(users)
-      }
-    )
-   
-   todoRef
-    .onSnapshot(
-      querySnapshot => {
-        const users12 = []
-        querySnapshot.forEach((doc) => {
-          const {amountRecieve} = doc.data()
-          users12.push({
-            amountRecieve,
-           
-          })
-          console.log(amountRecieve)
-        })
-        setUsers12(users12)
-      }
-    )
-    console.log('users:', users);
-console.log('users12:', users12);
-  }, []);
-
-
-
-
-
   return (
-    <View>
-<View>
-<FlatList
-    data={users12}
-    numColumns={1}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({item}) => (
-        <View>
-            <Text>{item.amountRecieve}</Text>
-        </View>
-    )} 
-    />
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Ionicons name="cash-outline" size={24} color="#2ecc71" />
+        <TouchableOpacity style={styles.menuButton}>
+          <Ionicons name="menu-outline" size={24} color="#2ecc71" />
+        </TouchableOpacity>
+      </View>
 
-</View>
-<View>
+      <View style={styles.balanceContainer}>
+        <Text style={styles.balanceLabel}>Available Balance</Text>
+        <Text style={styles.balanceAmount}>$500.00</Text>
+      </View>
 
-<SectionList
-    data={users}
-    numColumns={1}
-    keyExtractor={(item, index) => index.toString()}
-    renderItem={({item: item1}) => (
-        <View>
-            <Text>{item1.amountSend}</Text>
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity style={[styles.button, styles.sendButton]}>
+          <Ionicons name="arrow-up-outline" size={40} color="#fff" />
+          <Text style={styles.buttonText}>Send Money</Text>
+        </TouchableOpacity>
 
-        </View>
-    
-    )}
+        <TouchableOpacity style={[styles.button, styles.requestButton]}>
+          <Ionicons name="arrow-down-outline" size={40} color="#fff" />
+          <Text style={styles.buttonText}>Request Money</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
 
-    />
-</View>
-
-  
-    
-  </View>
-  )
-}
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingHorizontal: 20,
+    paddingTop: 50,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  logo: {
+    width: 120,
+    height: 40,
+  },
+  menuButton: {
+    padding: 10,
+  },
+  menuIcon: {
+    width: 24,
+    height: 24,
+  },
+  balanceContainer: {
+    alignItems: "center",
+    marginBottom: 30,
+  },
+  balanceLabel: {
+    fontSize: 16,
+    color: "#999",
+  },
+  balanceAmount: {
+    fontSize: 32,
+    fontWeight: "bold",
+  },
+  buttonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  button: {
+    flex: 1,
+    backgroundColor: "#4CAF50",
+    borderRadius: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 10,
+    marginHorizontal: 5,
+    alignItems: "center",
+  },
+  sendButton: {
+    backgroundColor: "#4CAF50",
+  },
+  requestButton: {
+    backgroundColor: "#FF5722",
+  },
+  buttonIcon: {
+    width: 40,
+    height: 40,
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+});
 
 export default Try

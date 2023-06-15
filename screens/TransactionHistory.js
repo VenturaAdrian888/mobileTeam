@@ -12,13 +12,11 @@ import {
 import React, { useState, useEffect } from "react";
 import { auth, firebase } from "../firebase";
 import { collection, doc, getDoc, querySnapshot } from "firebase/firestore";
-import { db } from "../firebase";
-import { getAuth } from "firebase/auth";
-import { LinearGradient } from "expo-linear-gradient";
-import moment from "moment";
+import { useNavigation } from "@react-navigation/core";
 import { Ionicons } from "@expo/vector-icons";
 
 const TransactionHistory = () => {
+  const navigation = useNavigation();
   const user = auth.currentUser;
   const uid = user.uid;
 
@@ -31,6 +29,13 @@ const TransactionHistory = () => {
 
   const [users1, setUsers1] = useState([]);
   const toReff = todoRef.doc(uid).collection("recieveTransaction");
+
+  const rec = () => {
+    navigation.navigate("TransactionReceived");
+  }
+  const send = () => {
+    navigation.navigate("TransactionSend");
+  }
 
   const loadData = () => {
     todoRef
@@ -45,7 +50,9 @@ const TransactionHistory = () => {
   };
 
   const sendTransaction = () => {
-    toRef.onSnapshot((querySnapshot) => {
+    toRef
+    .limit(5)
+    .onSnapshot((querySnapshot) => {
       const users = [];
       querySnapshot.forEach((doc) => {
         const { amountSend, recieverName, senderName, timeStamp } = doc.data();
@@ -56,12 +63,15 @@ const TransactionHistory = () => {
           timeStamp,
         });
       });
-      setUsers(users);
+      users.sort((a,b) => a.timeStamp - b.timeStamp)
+         setUsers(users)
     });
   };
 
   const recieveTransaction = () => {
-    toReff.onSnapshot((querySnapshot) => {
+    toReff
+    .limit(5)
+    .onSnapshot((querySnapshot) => {
       const users1 = [];
       querySnapshot.forEach((doc1) => {
         const { amountRecieve, recieverName, senderName, timeStamp } =
@@ -72,9 +82,10 @@ const TransactionHistory = () => {
           senderName,
           timeStamp,
         });
-        console.log(recieverName);
+        
       });
-      setUsers1(users1);
+      users1.sort((a,b) => a.timeStamp - b.timeStamp)
+         setUsers1(users1)
     });
   };
 
@@ -112,7 +123,7 @@ const TransactionHistory = () => {
           }}
         >
           <Text style={{ fontSize: 17, fontWeight: "500" }}>Received</Text>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={rec}>
             <Text style={{ fontWeight: "bold", color: "#2ecc71" }}>
               See all
             </Text>
@@ -187,7 +198,7 @@ const TransactionHistory = () => {
           }}
         >
           <Text style={{ fontSize: 17, fontWeight: "500" }}>Sent</Text>
-          <TouchableOpacity onPress={() => {}}>
+          <TouchableOpacity onPress={send}>
             <Text style={{ fontWeight: "bold", color: "#2ecc71" }}>
               See all
             </Text>

@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-import React from "react";
-import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-
-export default function Profile() {
-  const handleLogout = () => {
-    console.log("Logout button clicked!");
-    // Implement logout logic here
-  };
-=======
 import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, Modal, TextInput, Button, Image, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,7 +9,6 @@ export default function Profile() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [availableAmount, setAvailableAmount] = useState('');
->>>>>>> 47586bb4bf8282d9d76c6233c5bb50a1831ebaf6
 
   const handleCardPress = (cardName) => {
     if (cardName === 'Profile Update') {
@@ -31,8 +19,6 @@ export default function Profile() {
     }
   };
 
-<<<<<<< HEAD
-=======
   const pass = auth.currentUser;
   const uid = pass.uid;
   const [current, setCurrent] = useState('');
@@ -69,7 +55,6 @@ export default function Profile() {
     });
   };
 
->>>>>>> 47586bb4bf8282d9d76c6233c5bb50a1831ebaf6
   return (
     <View style={styles.container}>
 
@@ -79,59 +64,36 @@ export default function Profile() {
           style={styles.profileImage}
         />
         <Text style={styles.userName}>{current.firstName} {current.lastName}</Text>
-        <Text style={styles.balance}>{current.availableAmount}</Text>
+        <View
+        style={styles.column}
+        >
+
+         <Text style={styles.text}>Account Number: </Text> 
+         
+         <Text style={styles.balance}>{uid}</Text> 
+        </View>
+        
       </View>
 
-<<<<<<< HEAD
-      <View style={styles.cardContainer}>
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => handleCardPress("Card 1")}
-        >
-=======
       <ScrollView contentContainerStyle={styles.cardContainer}>
         <TouchableOpacity style={styles.card} onPress={() => handleCardPress('Card 1')}>
->>>>>>> 47586bb4bf8282d9d76c6233c5bb50a1831ebaf6
           <Ionicons name="ios-speedometer" size={60} color="white" />
           <Text style={styles.cardText}>Card 1</Text>
         </TouchableOpacity>
 
-<<<<<<< HEAD
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => handleCardPress("Card 2")}
-        >
-=======
         <TouchableOpacity style={styles.card} onPress={() => handleCardPress('Card 2')}>
->>>>>>> 47586bb4bf8282d9d76c6233c5bb50a1831ebaf6
           <Ionicons name="ios-alarm" size={60} color="white" />
           <Text style={styles.cardText}>Card 2</Text>
         </TouchableOpacity>
 
-<<<<<<< HEAD
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => handleCardPress("Card 3")}
-        >
-=======
         <TouchableOpacity style={styles.card} onPress={() => handleCardPress('Card 3')}>
->>>>>>> 47586bb4bf8282d9d76c6233c5bb50a1831ebaf6
           <Ionicons name="ios-wallet" size={60} color="white" />
           <Text style={styles.cardText}>Card 3</Text>
         </TouchableOpacity>
 
-<<<<<<< HEAD
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => handleCardPress("Card 4")}
-        >
-          <Ionicons name="ios-chatbubbles" size={60} color="white" />
-          <Text style={styles.cardText}>Card 4</Text>
-=======
         <TouchableOpacity style={styles.card} onPress={() => handleCardPress('Profile Update')}>
           <Ionicons name="ios-person" size={60} color="white" />
           <Text style={styles.cardText}>Update Profile</Text>
->>>>>>> 47586bb4bf8282d9d76c6233c5bb50a1831ebaf6
         </TouchableOpacity>
       </ScrollView>
 
@@ -161,25 +123,20 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
+  column: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F1F3F6",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F1F3F6',
   },
-<<<<<<< HEAD
-  logoutButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    padding: 10,
-  },
-=======
->>>>>>> 47586bb4bf8282d9d76c6233c5bb50a1831ebaf6
   title: {
     fontSize: 24,
-    fontWeight: "bold",
-    position: "absolute",
+    fontWeight: 'bold',
+    position: 'absolute',
     top: 10,
     left: 10,
   },
@@ -195,44 +152,41 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 28,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: 'bold',
+    textAlign: 'center',
     marginBottom: 10,
-    color: "#333",
+    color: '#333',
   },
-  balance: {
+ text: {
     fontSize: 18,
-    textAlign: "center",
-    color: "#555",
+    textAlign: 'center',
+    color: '#222',
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+balance: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: '#222',
+    marginBottom: 10,
   },
   cardContainer: {
-<<<<<<< HEAD
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    alignItems: "center",
-=======
     flexGrow: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
     alignItems: 'center',
->>>>>>> 47586bb4bf8282d9d76c6233c5bb50a1831ebaf6
     marginHorizontal: 10,
   },
   card: {
     width: 150,
     height: 150,
-<<<<<<< HEAD
-    backgroundColor: "#4F6D7A",
-=======
     backgroundColor: '#2E7D32',
->>>>>>> 47586bb4bf8282d9d76c6233c5bb50a1831ebaf6
     borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     margin: 10,
-    shadowColor: "rgba(0, 0, 0, 0.3)",
+    shadowColor: 'rgba(0, 0, 0, 0.3)',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 4,
@@ -240,12 +194,10 @@ const styles = StyleSheet.create({
   },
   cardText: {
     fontSize: 18,
-    fontWeight: "bold",
-    color: "white",
+    fontWeight: 'bold',
+    color: 'white',
     marginTop: 10,
   },
-<<<<<<< HEAD
-=======
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -264,5 +216,4 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
   },
->>>>>>> 47586bb4bf8282d9d76c6233c5bb50a1831ebaf6
 });

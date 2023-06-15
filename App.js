@@ -10,6 +10,8 @@ import CoinListScreen from "./screens/CoinList";
 import Try from "./screens/Try";
 import { View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import TransactionListReceived from "./screens/TransactionListReceived";
+import TransactionListSend from "./screens/TransactionListSend";
 
 const Stack = createNativeStackNavigator();
 
@@ -68,6 +70,16 @@ export default function App() {
           options={{ headerShadowVisible: false, headerTitle: "" }}
           name="CoinListScreen"
           component={CoinListScreen}
+        />
+        <Stack.Screen
+          options={{ headerShadowVisible: false, headerTitle: "" }}
+          name="TransactionReceived"
+          component={TransactionListReceived}
+        />
+        <Stack.Screen
+          options={{ headerShadowVisible: false, headerTitle: "" }}
+          name="TransactionSend"
+          component={TransactionListSend}
         />
         <Stack.Screen name="Try" component={Try} />
       </Stack.Navigator>
