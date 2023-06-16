@@ -6,10 +6,8 @@ import {
   Text,
   Image,
   TextInput,
-  TouchableOpacity,
   Pressable,
   View,
-  ScrollView,
 } from "react-native";
 import { auth, firebase } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";

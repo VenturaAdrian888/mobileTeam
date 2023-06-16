@@ -1,17 +1,6 @@
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  Pressable,
-  TouchableOpacity,
-  Button,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
 import { auth, firebase } from "../firebase";
-import { getAuth, updateProfile } from "firebase/auth";
-import { collection, setDoc, doc, getDoc, Firestore } from "firebase/firestore";
-import { db } from "../firebase";
 import { useNavigation } from "@react-navigation/core";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -48,20 +37,18 @@ const Dashboard = () => {
   const [current, setCurrent] = useState("");
   const todoRef = firebase.firestore().collection("Users");
 
-  //fetch data(availableAmount) once
+  // Fetch data (availableAmount) once
   const loadData = () => {
-    todoRef
-      .doc(uid)
-      .get()
-      .then((documentSnapshot) => {
-        console.log("user exixts: ", documentSnapshot.exists);
+    todoRef.doc(uid).onSnapshot((documentSnapshot) => {
+      console.log("user exists: ", documentSnapshot.exists);
 
-        if (documentSnapshot.exists) {
-          console.log("User data: ", documentSnapshot.data());
-          setCurrent(documentSnapshot.data());
-        }
-      });
+      if (documentSnapshot.exists) {
+        console.log("User data: ", documentSnapshot.data());
+        setCurrent(documentSnapshot.data());
+      }
+    });
   };
+
   useEffect(() => {
     loadData();
   }, []);
@@ -78,7 +65,7 @@ const Dashboard = () => {
           <Text style={styles.titleText}>Balance</Text>
           <Text style={styles.regularText}>{current.availableAmount}</Text>
         </View>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={loadData}>
           <Ionicons name="reload-outline" size={15} color="white" />
         </TouchableOpacity>
       </View>

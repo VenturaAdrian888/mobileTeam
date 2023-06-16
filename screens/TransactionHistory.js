@@ -2,11 +2,8 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   FlatList,
   TouchableOpacity,
-  SectionList,
-  SafeAreaView,
   ScrollView,
 } from "react-native";
 import React, { useState, useEffect } from "react";
@@ -32,10 +29,10 @@ const TransactionHistory = () => {
 
   const rec = () => {
     navigation.navigate("TransactionReceived");
-  }
+  };
   const send = () => {
     navigation.navigate("TransactionSend");
-  }
+  };
 
   const loadData = () => {
     todoRef
@@ -50,9 +47,7 @@ const TransactionHistory = () => {
   };
 
   const sendTransaction = () => {
-    toRef
-    .limit(5)
-    .onSnapshot((querySnapshot) => {
+    toRef.limit(5).onSnapshot((querySnapshot) => {
       const users = [];
       querySnapshot.forEach((doc) => {
         const { amountSend, recieverName, senderName, timeStamp } = doc.data();
@@ -63,15 +58,13 @@ const TransactionHistory = () => {
           timeStamp,
         });
       });
-      users.sort((a,b) => a.timeStamp - b.timeStamp)
-         setUsers(users)
+      users.sort((a, b) => b.timeStamp - a.timeStamp);
+      setUsers(users);
     });
   };
 
   const recieveTransaction = () => {
-    toReff
-    .limit(5)
-    .onSnapshot((querySnapshot) => {
+    toReff.limit(5).onSnapshot((querySnapshot) => {
       const users1 = [];
       querySnapshot.forEach((doc1) => {
         const { amountRecieve, recieverName, senderName, timeStamp } =
@@ -82,10 +75,9 @@ const TransactionHistory = () => {
           senderName,
           timeStamp,
         });
-        
       });
-      users1.sort((a,b) => a.timeStamp - b.timeStamp)
-         setUsers1(users1)
+      users1.sort((a, b) => b.timeStamp - a.timeStamp);
+      setUsers1(users1);
     });
   };
 

@@ -8,18 +8,7 @@ import {
   FlatList,
 } from "react-native";
 import { auth, db, firebase } from "../firebase";
-import {
-  collection,
-  setDoc,
-  doc,
-  getDoc,
-  querySnapshot,
-  documentSnapshot,
-  getDocs,
-  snapshotEqual,
-  onSnapshot,
-  runTransaction,
-} from "firebase/firestore";
+import { runTransaction } from "firebase/firestore";
 import { v4 as uuid } from "uuid";
 import { useNavigation } from "@react-navigation/core";
 import { Ionicons } from "@expo/vector-icons";
@@ -33,21 +22,14 @@ const SendCash = () => {
   const ownid = user.uid;
 
   const todoRef = firebase.firestore().collection("Users");
-  const toReff = todoRef.doc(ownid).collection('sendTransaction');
+  const toReff = todoRef.doc(ownid).collection("sendTransaction");
   const [users, setUsers] = useState([]);
-  const [selectedReceiver, setSelectedReceiver] = useState('');
+  const [selectedReceiver, setSelectedReceiver] = useState("");
 
   const [availableAmount1, setAvailableAmount1] = useState("");
   const [uid, setUid] = useState("");
   const [current1, setCurrent1] = useState("");
   const navigation = useNavigation();
-
-  
-
-  const reload = () => {
-    navigation.navigate("Dashboard");
-    navigation.navigate("Send");
-  };
 
   const loadData = () => {
     todoRef
@@ -58,53 +40,51 @@ const SendCash = () => {
           setCurrent1(documentSnapshot.data());
         }
       });
+    setUid("");
+    setAvailableAmount1("");
   };
 
   const recieveTransaction = () => {
-    toReff
-    .onSnapshot(
-      querySnapshot => {
-        const users = {};
-        querySnapshot.forEach(doc => {
-          const { recieverUid, recieverName, timeStamp} = doc.data();
+    toReff.onSnapshot((querySnapshot) => {
+      const users = {};
+      querySnapshot.forEach((doc) => {
+        const { recieverUid, recieverName, timeStamp } = doc.data();
 
-          if(!users[recieverName]){
+        if (!users[recieverName]) {
+          users[recieverName] = {
+            recieverName,
+            recieverUid,
+            timeStamp,
+          };
+        } else {
+          const existingTransaction = users[recieverName];
+
+          if (timeStamp > existingTransaction.timeStamp) {
             users[recieverName] = {
               recieverName,
               recieverUid,
-              timeStamp
-               }
-        }
-            else {
-                const existingTransaction = users[recieverName]
-                
-                if (timeStamp.toDate() > existingTransaction.timeStamp){
-                  users[recieverName] =  {
-                    recieverName,
-                    recieverUid,
-                    timeStamp
-                  }
-        }
+              timeStamp,
+            };
           }
-        })
-        const sort = Object.values(users).sort((a,b)=> b.timeStamp - a.timeStamp)
-        const re = sort.slice(0, 5)
-        setUsers(re)
-      }
-    )
-}
+        }
+      });
+      const sort = Object.values(users).sort(
+        (a, b) => b.timeStamp - a.timeStamp
+      );
+      const re = sort.slice(0, 5);
+      setUsers(re);
+    });
+  };
 
   useEffect(() => {
     loadData();
     recieveTransaction();
   }, []);
 
-  const handleRecieverClick = (recieverUid)=>{
+  const handleRecieverClick = (recieverUid) => {
     setUid(recieverUid);
     setSelectedReceiver(recieverUid);
-  }
-
-
+  };
 
   const upData = async () => {
     const sfDocRef = todoRef.doc(uid);
@@ -153,45 +133,39 @@ const SendCash = () => {
           });
         }
       });
+      loadData();
     } catch (e) {
       console.log("Transaction failed: ", e);
     }
   };
 
-  const handle = () => {
-    upData();
-    reload();
-  };
-
-
-
   return (
     <View style={styles.container}>
       <View>
         <Text style={styles.headerText}>Send money</Text>
-
         <View>
           <Text style={{ fontWeight: "bold" }}>Recent Contacts </Text>
           <View style={styles.recentContactsContainer}>
-            <SafeAreaView>
-              <FlatList
+            <FlatList
               data={users}
-              numColumns={5}
-              renderItem={({item}) => (
-        
-                <View>
-                  <TouchableOpacity onPress={() => handleRecieverClick(item.recieverUid)}>
-                  <View style={styles.itemContainer}>
-                    <Ionicons name="person" size={24} color="green" />
-                      <Text style={styles.itemText}>
-                        {item.recieverName} 
-                      </Text>
+              horizontal={true}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.mediumButtonContainer,
+                    { marginLeft: 10, marginTop: 10, marginBottom: 10 },
+                  ]}
+                  onPress={() => handleRecieverClick(item.recieverUid)}
+                >
+                  <View style={styles.circle}>
+                    <Ionicons name="person" size={15} color="white" />
                   </View>
-                  </TouchableOpacity>
-                </View>
+                  <Text numberOfLines={1} style={{ fontSize: 12 }}>
+                    {item.recieverName}
+                  </Text>
+                </TouchableOpacity>
               )}
-              />
-            </SafeAreaView>
+            />
           </View>
         </View>
 
@@ -202,11 +176,11 @@ const SendCash = () => {
             onChangeText={setUid}
             placeholder="Enter account number"
             style={styles.input}
-            
           />
           <Text style={{ fontWeight: "bold" }}>Amount</Text>
           <TextInput
             value={availableAmount1}
+            keyboardType="numeric"
             onChangeText={setAvailableAmount1}
             placeholder="Enter amount"
             style={styles.input}
@@ -220,7 +194,7 @@ const SendCash = () => {
           </Text>
         </View>
       </View>
-      <TouchableOpacity onPress={handle} style={styles.button}>
+      <TouchableOpacity onPress={upData} style={styles.button}>
         <Text style={styles.buttonText}>Send</Text>
       </TouchableOpacity>
     </View>
@@ -241,10 +215,8 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     borderStyle: "dashed",
     borderWidth: 0.4,
-    borderRadius: 10,
-    height: 70,
-    alignItems: "center",
-    padding: 16,
+    borderRadius: 25,
+    height: 95,
   },
   headerText: {
     fontWeight: "500",
@@ -254,13 +226,6 @@ const styles = StyleSheet.create({
   inputContainer: {
     gap: 3,
     marginBottom: 30,
-  },
-  nameRowContainer: {
-    width: "100%",
-    justifyContent: "space-between",
-    flexDirection: "row",
-    marginBottom: 7,
-    gap: 7,
   },
   input: {
     paddingHorizontal: 15,
@@ -280,9 +245,26 @@ const styles = StyleSheet.create({
     marginTop: 5,
     borderWidth: 0.4,
   },
-  buttonContainer: {
+  mediumButtonContainer: {
+    height: 75,
+    width: 75,
+    padding: 10,
+    justifyContent: "center",
     alignItems: "center",
-    gap: 10,
+    flexDirection: "row",
+    borderRadius: 15,
+    alignContent: "center",
+    flexWrap: "wrap",
+    backgroundColor: "#EDf9EB",
+  },
+  circle: {
+    width: 30,
+    height: 30,
+    borderRadius: 100,
+    backgroundColor: "#2E7D32",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 5,
   },
   button: {
     backgroundColor: "#2ecc71",
@@ -308,7 +290,7 @@ const styles = StyleSheet.create({
   itemText: {
     marginLeft: 12,
   },
-  infos:{
-    marginTop:20
-  }
+  infos: {
+    marginTop: 20,
+  },
 });

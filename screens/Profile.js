@@ -1,17 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Modal, TextInput, Button, Image, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { auth, firebase } from '../firebase';
-import { collection, setDoc, doc, getDoc, Firestore } from 'firebase/firestore';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Modal,
+  TextInput,
+  Button,
+  Image,
+  ScrollView,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { auth, firebase } from "../firebase";
 
 export default function Profile() {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [availableAmount, setAvailableAmount] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [availableAmount, setAvailableAmount] = useState("");
 
   const handleCardPress = (cardName) => {
-    if (cardName === 'Profile Update') {
+    if (cardName === "Profile Update") {
       setIsModalVisible(true);
     } else {
       console.log(`Clicked on ${cardName} card!`);
@@ -21,18 +30,18 @@ export default function Profile() {
 
   const pass = auth.currentUser;
   const uid = pass.uid;
-  const [current, setCurrent] = useState('');
-  const todoRef = firebase.firestore().collection('Users');
+  const [current, setCurrent] = useState("");
+  const todoRef = firebase.firestore().collection("Users");
 
   const loadData = () => {
     todoRef
       .doc(uid)
       .get()
       .then((documentSnapshot) => {
-        console.log('user exists:', documentSnapshot.exists);
+        console.log("user exists:", documentSnapshot.exists);
 
         if (documentSnapshot.exists) {
-          console.log('User data:', documentSnapshot.data());
+          console.log("User data:", documentSnapshot.data());
           setCurrent(documentSnapshot.data());
         }
       });
@@ -48,50 +57,62 @@ export default function Profile() {
       lastName: lastName,
     };
 
-    todoRef.doc(uid).update(updatedData).then(() => {
-      console.log('Profile updated successfully!');
-      setIsModalVisible(false);
-      loadData(); // Reload the updated data
-    });
+    todoRef
+      .doc(uid)
+      .update(updatedData)
+      .then(() => {
+        console.log("Profile updated successfully!");
+        setIsModalVisible(false);
+        loadData(); // Reload the updated data
+      });
   };
 
   return (
     <View style={styles.container}>
-
       <View style={styles.profileContainer}>
         <Image
-          source={require('../assets/profile-icon.jpg')}
+          source={require("../assets/profile-icon.jpg")}
           style={styles.profileImage}
         />
-        <Text style={styles.userName}>{current.firstName} {current.lastName}</Text>
-        <View
-        style={styles.column}
-        >
+        <Text style={styles.userName}>
+          {current.firstName} {current.lastName}
+        </Text>
+        <View style={styles.column}>
+          <Text style={styles.text}>Account Number: </Text>
 
-         <Text style={styles.text}>Account Number: </Text> 
-         
-         <Text style={styles.balance}>{uid}</Text> 
+          <Text style={styles.balance}>{uid}</Text>
         </View>
-        
       </View>
 
       <ScrollView contentContainerStyle={styles.cardContainer}>
-        <TouchableOpacity style={styles.card} onPress={() => handleCardPress('Card 1')}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => handleCardPress("Card 1")}
+        >
           <Ionicons name="ios-speedometer" size={60} color="white" />
           <Text style={styles.cardText}>Card 1</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card} onPress={() => handleCardPress('Card 2')}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => handleCardPress("Card 2")}
+        >
           <Ionicons name="ios-alarm" size={60} color="white" />
           <Text style={styles.cardText}>Card 2</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card} onPress={() => handleCardPress('Card 3')}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => handleCardPress("Card 3")}
+        >
           <Ionicons name="ios-wallet" size={60} color="white" />
           <Text style={styles.cardText}>Card 3</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card} onPress={() => handleCardPress('Profile Update')}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => handleCardPress("Profile Update")}
+        >
           <Ionicons name="ios-person" size={60} color="white" />
           <Text style={styles.cardText}>Update Profile</Text>
         </TouchableOpacity>
@@ -124,24 +145,24 @@ export default function Profile() {
 
 const styles = StyleSheet.create({
   column: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F1F3F6',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F1F3F6",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    position: 'absolute',
+    fontWeight: "bold",
+    position: "absolute",
     top: 10,
     left: 10,
   },
   profileContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 20,
   },
   profileImage: {
@@ -152,41 +173,41 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginBottom: 10,
-    color: '#333',
+    color: "#333",
   },
- text: {
+  text: {
     fontSize: 18,
-    textAlign: 'center',
-    color: '#222',
-    fontWeight: 'bold',
+    textAlign: "center",
+    color: "#222",
+    fontWeight: "bold",
     marginBottom: 10,
   },
-balance: {
+  balance: {
     fontSize: 18,
-    textAlign: 'center',
-    color: '#222',
+    textAlign: "center",
+    color: "#222",
     marginBottom: 10,
   },
   cardContainer: {
     flexGrow: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
     marginHorizontal: 10,
   },
   card: {
     width: 150,
     height: 150,
-    backgroundColor: '#2E7D32',
+    backgroundColor: "#2E7D32",
     borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     margin: 10,
-    shadowColor: 'rgba(0, 0, 0, 0.3)',
+    shadowColor: "rgba(0, 0, 0, 0.3)",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 4,
@@ -194,24 +215,24 @@ balance: {
   },
   cardText: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
     marginTop: 10,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   input: {
-    width: '80%',
+    width: "80%",
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,

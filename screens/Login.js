@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { StatusBar } from "react-native-web";
 
 const Login = () => {
   const navigation = useNavigation();
