@@ -1,32 +1,36 @@
 import React, { useEffect, useState } from "react";
-import { getMarketData } from "../CoinGeckoAPI";
-
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, FlatList } from "react-native";
+import { getMarketData } from "../lib/CoinGecko";
 import ListItem from "../components/ListItem";
-import { FlatList } from "react-native";
 
-const CoinListScreen = () => {
-  const [data, setData] = useState([]);
-  const [selectedCoinData, setSelectedCoinData] = useState(null);
+const CoinLists = () => {
+  // State for storing market data
+  const [marketData, setMarketData] = useState([]);
 
+  // Function to open modal for item
   const openModal = (item) => {
-    // Your logic for opening the modal
     console.log("Opening modal for item:", item);
   };
+
   useEffect(() => {
+    // Fetch market data on component mount
     const fetchMarketData = async () => {
-      const marketData = await getMarketData();
-      setData(marketData);
+      try {
+        const data = await getMarketData();
+        setMarketData(data);
+      } catch (error) {
+        console.error("Error fetching market data:", error);
+      }
     };
 
     fetchMarketData();
   }, []);
 
   return (
-    <SafeAreaView>
+    <View style={styles.container}>
       <FlatList
         keyExtractor={(item) => item.id}
-        data={data}
+        data={marketData}
         renderItem={({ item }) => (
           <ListItem
             name={item.name}
@@ -40,8 +44,15 @@ const CoinListScreen = () => {
           />
         )}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
-export default CoinListScreen;
+const styles = {
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+};
+
+export default CoinLists;

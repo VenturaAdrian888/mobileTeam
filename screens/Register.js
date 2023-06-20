@@ -9,7 +9,7 @@ import {
   Pressable,
   View,
 } from "react-native";
-import { auth, firebase } from "../firebase";
+import { auth, firebase } from "../lib/Firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 
@@ -21,7 +21,7 @@ const Register = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [availableAmount] = useState("0");
+  const [availableBalance] = useState("0");
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -46,14 +46,10 @@ const Register = () => {
           lastName: lastName,
           email: email,
           password: password,
-          availableAmount: Number(availableAmount),
+          availableBalance: Number(availableBalance),
         });
       })
       .catch((error) => alert(error.message));
-  };
-
-  const handleLogin = () => {
-    navigation.navigate("Login");
   };
 
   return (
@@ -66,7 +62,7 @@ const Register = () => {
       <Image
         style={styles.imageContainer}
         resizeMode="contain"
-        source={require("../assets/register-image.png")}
+        source={require("../assets/illustrations/register-image.png")}
       />
 
       <View>
@@ -109,7 +105,7 @@ const Register = () => {
             <Text style={styles.buttonText}>Register</Text>
           </Pressable>
 
-          <Pressable onPress={handleLogin}>
+          <Pressable onPress={() => navigation.navigate("Login")}>
             <Text style={{ fontWeight: "bold" }}>
               Already have an account?
               <Text style={{ color: "#2ecc71" }}> Login</Text>
@@ -166,7 +162,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     alignItems: "center",
-    gap: 10,
+    gap: 15,
   },
   button: {
     backgroundColor: "#2ecc71",

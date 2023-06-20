@@ -1,28 +1,17 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React, { useState, useEffect } from "react";
-import { auth, firebase } from "../firebase";
+import { View, Text, StyleSheet, Pressable } from "react-native";
+import { auth, firebase } from "../lib/Firebase";
 import { useNavigation } from "@react-navigation/core";
 import { Ionicons } from "@expo/vector-icons";
 
 const Dashboard = () => {
   const navigation = useNavigation();
 
-  const send = () => {
-    navigation.navigate("Send");
-  };
+  const uid = auth.currentUser.uid;
+  const [user, setUser] = useState({});
+  const ref = firebase.firestore().collection("Users");
 
-  const transactionHistory = () => {
-    navigation.navigate("TransactionHistory");
-  };
-
-  const profile = () => {
-    navigation.navigate("Profile");
-  };
-
-  const coinsList = () => {
-    navigation.navigate("CoinListScreen");
-  };
-
+  // Function to handle logout
   const logout = () => {
     auth
       .signOut()
@@ -32,19 +21,12 @@ const Dashboard = () => {
       .catch((error) => alert(error.message));
   };
 
-  const pass = auth.currentUser;
-  const uid = pass.uid;
-  const [current, setCurrent] = useState("");
-  const todoRef = firebase.firestore().collection("Users");
-
-  // Fetch data (availableAmount) once
+  // Function to load user data from Firestore
   const loadData = () => {
-    todoRef.doc(uid).onSnapshot((documentSnapshot) => {
-      console.log("user exists: ", documentSnapshot.exists);
-
+    ref.doc(uid).onSnapshot((documentSnapshot) => {
       if (documentSnapshot.exists) {
         console.log("User data: ", documentSnapshot.data());
-        setCurrent(documentSnapshot.data());
+        setUser(documentSnapshot.data());
       }
     });
   };
@@ -55,115 +37,107 @@ const Dashboard = () => {
 
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          styles.header,
-          { flexDirection: "row", justifyContent: "space-between" },
-        ]}
-      >
+      <View style={styles.header}>
         <View>
-          <Text style={styles.titleText}>Balance</Text>
-          <Text style={styles.regularText}>{current.availableAmount}</Text>
+          <Text style={[styles.titleText, { color: "white" }]}>Balance</Text>
+          <Text style={styles.regularText}>{user.availableBalance}</Text>
         </View>
-        <TouchableOpacity onPress={loadData}>
+
+        <Pressable onPress={() => loadData()}>
           <Ionicons name="reload-outline" size={15} color="white" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
-      <View
-        style={{
-          borderBottomColor: "lightgray",
-          borderBottomWidth: StyleSheet.hairlineWidth,
-          margin: 20,
-        }}
-      />
+      <View style={styles.divider} />
 
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.mediumButtonContainer} onPress={send}>
+        <Pressable
+          style={styles.mediumButtonContainer}
+          onPress={() => navigation.navigate("Send")}
+        >
           <View style={styles.circleContainer}>
             <View style={styles.circle}>
               <Ionicons name="send" size={20} color="white" />
             </View>
           </View>
-          <Text style={[styles.titleText, { color: "black" }]}>Send</Text>
-        </TouchableOpacity>
+          <Text style={styles.titleText}>Send</Text>
+        </Pressable>
 
-        <TouchableOpacity
+        <Pressable
           style={styles.mediumButtonContainer}
-          onPress={console.log("pressed")}
+          onPress={() => console.log("Pressed")}
         >
           <View style={styles.circleContainer}>
             <View style={styles.circle}>
-              <Ionicons name="qr-code-outline" size={20} color="white" />
+              <Ionicons name="qr-code" size={20} color="white" />
             </View>
           </View>
-          <Text style={[styles.titleText, { color: "black" }]}>Scan</Text>
-        </TouchableOpacity>
+          <Text style={styles.titleText}>Scan</Text>
+        </Pressable>
 
-        <TouchableOpacity
+        <Pressable
           style={styles.mediumButtonContainer}
-          onPress={console.log("pressed")}
+          onPress={() => console.log("pressed")}
         >
           <View style={styles.circleContainer}>
             <View style={styles.circle}>
-              <Ionicons name="cash-outline" size={20} color="white" />
+              <Ionicons name="cash" size={20} color="white" />
             </View>
           </View>
-          <Text style={styles.label}>Top up</Text>
-        </TouchableOpacity>
+          <Text style={styles.titleText}>Top up</Text>
+        </Pressable>
       </View>
 
-      <Text style={styles.HeadlineText}>Shortcuts</Text>
+      <Text style={styles.label}>Shortcuts</Text>
 
       <View style={[styles.buttonsContainer, { justifyContent: "flex-start" }]}>
         <View>
-          <TouchableOpacity style={{ alignItems: "center" }} onPress={profile}>
-            <View style={styles.smallButtonContainer}>
-              <Ionicons name="person-outline" size={22} color="white" />
-            </View>
-            <Text style={[styles.titleText, { color: "black", marginTop: 5 }]}>
-              Profile
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <View>
-          <TouchableOpacity
-            style={{ alignItems: "center" }}
-            onPress={coinsList}
+          <Pressable
+            style={{ alignItems: "center", gap: 5 }}
+            onPress={() => navigation.navigate("Profile")}
           >
             <View style={styles.smallButtonContainer}>
-              <Ionicons name="logo-bitcoin" size={22} color="white" />
+              <Ionicons name="person" size={20} color="white" />
             </View>
-            <Text style={[styles.titleText, { color: "black", marginTop: 5 }]}>
-              Crypto
-            </Text>
-          </TouchableOpacity>
+
+            <Text style={styles.titleText}>Profile</Text>
+          </Pressable>
         </View>
 
         <View>
-          <TouchableOpacity
-            style={{ alignItems: "center" }}
-            onPress={transactionHistory}
+          <Pressable
+            style={{ alignItems: "center", gap: 5 }}
+            onPress={() => navigation.navigate("CoinLists")}
           >
             <View style={styles.smallButtonContainer}>
-              <Ionicons name="list-outline" size={22} color="white" />
+              <Ionicons name="logo-bitcoin" size={20} color="white" />
             </View>
-            <Text style={[styles.titleText, { color: "black", marginTop: 5 }]}>
-              Transactions
-            </Text>
-          </TouchableOpacity>
+
+            <Text style={styles.titleText}>Crypto</Text>
+          </Pressable>
         </View>
 
         <View>
-          <TouchableOpacity style={{ alignItems: "center" }} onPress={logout}>
+          <Pressable
+            style={{ alignItems: "center", gap: 5 }}
+            onPress={() => navigation.navigate("TransactionHistory")}
+          >
             <View style={styles.smallButtonContainer}>
-              <Ionicons name="log-out-outline" size={22} color="white" />
+              <Ionicons name="list" size={20} color="white" />
             </View>
-            <Text style={[styles.titleText, { color: "black", marginTop: 5 }]}>
-              Logout
-            </Text>
-          </TouchableOpacity>
+
+            <Text style={styles.titleText}>Transactions</Text>
+          </Pressable>
+        </View>
+
+        <View>
+          <Pressable style={{ alignItems: "center", gap: 5 }} onPress={logout}>
+            <View style={styles.smallButtonContainer}>
+              <Ionicons name="log-out" size={20} color="white" />
+            </View>
+
+            <Text style={styles.titleText}>Logout</Text>
+          </Pressable>
         </View>
       </View>
     </View>
@@ -183,25 +157,32 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 25,
     alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
     backgroundColor: "#2ecc71",
+  },
+  divider: {
+    borderBottomColor: "lightgray",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    margin: 20,
   },
   titleText: {
     fontSize: 12,
-    color: "white",
   },
-  HeadlineText: {
+  label: {
     fontSize: 12,
+    marginTop: 10,
     marginBottom: 10,
     color: "gray",
   },
   regularText: {
     fontSize: 30,
     color: "white",
-    fontWeight: 700,
+    fontWeight: "bold",
   },
   buttonsContainer: {
     flexDirection: "row",
-    marginBottom: 20,
+    marginBottom: 5,
     justifyContent: "space-evenly",
     gap: 20,
   },
@@ -217,7 +198,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     backgroundColor: "#EDf9EB",
   },
-  circle: {
+  circleContainer: {
     width: 40,
     height: 40,
     borderRadius: 100,
@@ -230,7 +211,6 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     padding: 10,
-    marginBottom10: 10,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,

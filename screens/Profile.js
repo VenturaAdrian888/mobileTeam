@@ -11,20 +11,18 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { auth, firebase } from "../firebase";
+import { auth, firebase } from "../lib/Firebase";
 
 export default function Profile() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [availableAmount, setAvailableAmount] = useState("");
 
   const handleCardPress = (cardName) => {
     if (cardName === "Profile Update") {
       setIsModalVisible(true);
     } else {
       console.log(`Clicked on ${cardName} card!`);
-      // Handle the click event for each card
     }
   };
 

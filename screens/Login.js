@@ -6,10 +6,10 @@ import {
   Text,
   TextInput,
   Image,
-  TouchableOpacity,
+  Pressable,
   View,
 } from "react-native";
-import { auth } from "../firebase";
+import { auth } from "../lib/Firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
 const Login = () => {
@@ -28,10 +28,6 @@ const Login = () => {
     return unsubscribe;
   }, []);
 
-  const handleSignUp = () => {
-    navigation.navigate("Register");
-  };
-
   const handleLogin = () => {
     auth;
     signInWithEmailAndPassword(auth, email, password)
@@ -46,25 +42,29 @@ const Login = () => {
     <KeyboardAvoidingView style={styles.container} behavior="height">
       <View>
         <Text style={styles.headerText}>Welcome!</Text>
+
         <Text>Start your journey here</Text>
       </View>
 
       <Image
         style={styles.imageContainer}
         resizeMode="center"
-        source={require("../assets/login-image.png")}
+        source={require("../assets/illustrations/login-image.png")}
       />
 
       <View>
         <View style={styles.inputContainer}>
           <Text style={{ fontWeight: "bold" }}>Email</Text>
+
           <TextInput
             placeholder="Enter your email"
             value={email}
             onChangeText={(text) => setEmail(text)}
             style={styles.input}
           ></TextInput>
+
           <Text style={{ fontWeight: "bold" }}>Password</Text>
+
           <TextInput
             placeholder="Enter your password"
             value={password}
@@ -73,11 +73,7 @@ const Login = () => {
             secureTextEntry
           ></TextInput>
 
-          <TouchableOpacity
-            onPress={() => {
-              console.log = "fp btn pressed";
-            }}
-          >
+          <Pressable onPress={() => console.log("Pressed")}>
             <Text
               style={{
                 fontWeight: "bold",
@@ -87,20 +83,20 @@ const Login = () => {
             >
               Forgot Password?
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={handleLogin} style={styles.button}>
+          <Pressable onPress={() => handleLogin()} style={styles.button}>
             <Text style={styles.buttonText}>Get Started</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity onPress={handleSignUp}>
+          <Pressable onPress={() => navigation.navigate("Register")}>
             <Text style={{ fontWeight: "bold" }}>
               Don't have an account?{" "}
               <Text style={{ color: "#2ecc71" }}> Register Now</Text>
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
     </KeyboardAvoidingView>

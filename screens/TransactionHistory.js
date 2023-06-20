@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,167 +7,129 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import React, { useState, useEffect } from "react";
-import { auth, firebase } from "../firebase";
-import { collection, doc, getDoc, querySnapshot } from "firebase/firestore";
+import { auth, firebase } from "../lib/Firebase";
 import { useNavigation } from "@react-navigation/core";
 import { Ionicons } from "@expo/vector-icons";
 
 const TransactionHistory = () => {
   const navigation = useNavigation();
-  const user = auth.currentUser;
-  const uid = user.uid;
 
-  const todoRef = firebase.firestore().collection("Users");
+  const currentUserUID = auth.currentUser.uid;
 
-  const [balance, setBalance] = useState("");
+  const [currentUser, setCurrentUser] = useState("");
+  const [sentTransactions, setSentTransactions] = useState([]);
+  const [receivedTransactions, setReceivedTransactions] = useState([]);
 
-  const [users, setUsers] = useState([]);
-  const toRef = todoRef.doc(uid).collection("sendTransaction");
-
-  const [users1, setUsers1] = useState([]);
-  const toReff = todoRef.doc(uid).collection("recieveTransaction");
-
-  const rec = () => {
-    navigation.navigate("TransactionReceived");
-  };
-  const send = () => {
-    navigation.navigate("TransactionSend");
-  };
+  const currentUserRef = firebase.firestore().collection("Users");
+  const sentTransactionRef = currentUserRef
+    .doc(currentUserUID)
+    .collection("sentTransaction");
+  const receivedTransactionRef = currentUserRef
+    .doc(currentUserUID)
+    .collection("receivedTransaction");
 
   const loadData = () => {
-    todoRef
-      .doc(uid)
+    currentUserRef
+      .doc(currentUserUID)
       .get()
       .then((documentSnapshot) => {
         if (documentSnapshot.exists) {
           console.log("User data: ", documentSnapshot.data());
-          setBalance(documentSnapshot.data());
+          setCurrentUser(documentSnapshot.data());
         }
       });
   };
 
-  const sendTransaction = () => {
-    toRef.limit(5).onSnapshot((querySnapshot) => {
-      const users = [];
+  const loadSentTransactions = () => {
+    sentTransactionRef.limit(5).onSnapshot((querySnapshot) => {
+      const sent = [];
       querySnapshot.forEach((doc) => {
-        const { amountSend, recieverName, senderName, timeStamp } = doc.data();
-        users.push({
-          amountSend,
-          recieverName,
+        const { amountSent, receiverName, senderName, timeStamp } = doc.data();
+        sent.push({
+          amountSent,
+          receiverName,
           senderName,
           timeStamp,
         });
       });
-      users.sort((a, b) => b.timeStamp - a.timeStamp);
-      setUsers(users);
+      sent.sort((a, b) => b.timeStamp - a.timeStamp);
+      setSentTransactions(sent);
     });
   };
 
-  const recieveTransaction = () => {
-    toReff.limit(5).onSnapshot((querySnapshot) => {
-      const users1 = [];
-      querySnapshot.forEach((doc1) => {
-        const { amountRecieve, recieverName, senderName, timeStamp } =
-          doc1.data();
-        users1.push({
-          amountRecieve,
-          recieverName,
+  const loadReceivedTransactions = () => {
+    receivedTransactionRef.limit(5).onSnapshot((querySnapshot) => {
+      const received = [];
+      querySnapshot.forEach((doc) => {
+        const { amountReceived, receiverName, senderName, timeStamp } =
+          doc.data();
+        received.push({
+          amountReceived,
+          receiverName,
           senderName,
           timeStamp,
         });
       });
-      users1.sort((a, b) => b.timeStamp - a.timeStamp);
-      setUsers1(users1);
+      received.sort((a, b) => b.timeStamp - a.timeStamp);
+      setReceivedTransactions(received);
     });
   };
 
   useEffect(() => {
     loadData();
-    sendTransaction();
-    recieveTransaction();
+    loadSentTransactions();
+    loadReceivedTransactions();
   }, []);
 
   return (
     <ScrollView style={styles.container}>
-      <View style={[styles.header, { justifyContent: "center" }]}>
-        <Text style={{ color: "white" }}>Balance</Text>
-        <Text style={[styles.headerText, { color: "white" }]}>
-          $ {balance.availableAmount}
+      {/* Balance */}
+      <View style={[styles.header, styles.centeredContainer]}>
+        <Text style={styles.whiteText}>Balance</Text>
+        <Text style={[styles.headerText, styles.whiteText]}>
+          $ {currentUser.availableBalance}
         </Text>
       </View>
 
-      <View
-        style={{
-          borderBottomColor: "lightgray",
-          borderBottomWidth: StyleSheet.hairlineWidth,
-          margin: 30,
-        }}
-      />
+      {/* Divider */}
+      <View style={styles.divider}></View>
 
+      {/* Transaction List */}
       <Text style={styles.subHeaderText}>Transaction list</Text>
 
+      {/* Received Transactions */}
       <View>
-        <View
-          style={{
-            marginTop: 10,
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <Text style={{ fontSize: 17, fontWeight: "500" }}>Received</Text>
-          <TouchableOpacity onPress={rec}>
-            <Text style={{ fontWeight: "bold", color: "#2ecc71" }}>
-              See all
-            </Text>
+        <View style={styles.rowContainer}>
+          <Text style={styles.sectionTitle}>Received</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("TransactionReceived")}
+          >
+            <Text style={styles.sectionLink}>See all</Text>
           </TouchableOpacity>
         </View>
 
         <FlatList
           nestedScrollEnabled
-          data={users1}
+          data={receivedTransactions}
           renderItem={({ item }) => (
             <View>
-              <View
-                style={{
-                  borderBottomColor: "lightgray",
-                  borderBottomWidth: StyleSheet.hairlineWidth,
-                  margin: 10,
-                }}
-              />
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 5,
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
+              <View style={styles.transactionDivider} />
+              <View style={styles.transactionRow}>
+                <View style={styles.transactionInfo}>
                   <View style={styles.circle}>
                     <Ionicons name="cash-outline" size={20} color="white" />
                   </View>
-
-                  <View style={{ marginStart: 10 }}>
-                    <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+                  <View style={styles.transactionDetails}>
+                    <Text style={styles.transactionTitle}>
                       {item.senderName}
                     </Text>
                     <Text>
-                      {new Date(item.timeStamp.seconds * 1000).toDateString()}
-                      {new Date(
-                        item.timeStamp.seconds * 1000
-                      ).toLocaleTimeString()}
+                      {new Date(item.timeStamp.seconds * 1000).toLocaleString()}
                     </Text>
                   </View>
                 </View>
-
-                <Text style={{ fontSize: 25, fontWeight: "bold" }}>
-                  +${item.amountRecieve}
+                <Text style={styles.transactionAmount}>
+                  +${item.amountReceived}
                 </Text>
               </View>
             </View>
@@ -174,87 +137,49 @@ const TransactionHistory = () => {
         />
       </View>
 
+      {/* Sent Transactions */}
       <View>
-        <View
-          style={{
-            borderBottomColor: "lightgray",
-            borderBottomWidth: StyleSheet.hairlineWidth,
-            margin: 10,
-          }}
-        />
-        <View
-          style={{
-            marginTop: 30,
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <Text style={{ fontSize: 17, fontWeight: "500" }}>Sent</Text>
-          <TouchableOpacity onPress={send}>
-            <Text style={{ fontWeight: "bold", color: "#2ecc71" }}>
-              See all
-            </Text>
+        <View style={styles.transactionDivider} />
+        <View style={styles.rowContainer}>
+          <Text style={styles.sectionTitle}>Sent</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("TransactionSent")}
+          >
+            <Text style={styles.sectionLink}>See all</Text>
           </TouchableOpacity>
         </View>
 
         <FlatList
           nestedScrollEnabled
-          data={users}
+          data={sentTransactions}
           renderItem={({ item }) => (
             <View>
-              <View
-                style={{
-                  borderBottomColor: "lightgray",
-                  borderBottomWidth: StyleSheet.hairlineWidth,
-                  margin: 10,
-                }}
-              />
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 5,
-                }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
+              <View style={styles.transactionDivider} />
+              <View style={styles.transactionRow}>
+                <View style={styles.transactionInfo}>
                   <View style={styles.circle}>
                     <Ionicons name="send-outline" size={20} color="white" />
                   </View>
-
-                  <View style={{ marginStart: 10 }}>
-                    <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                      {item.recieverName}
+                  <View style={styles.transactionDetails}>
+                    <Text style={styles.transactionTitle}>
+                      {item.receiverName}
                     </Text>
                     <Text>
-                      {new Date(item.timeStamp.seconds * 1000).toDateString()}
-                      {new Date(
-                        item.timeStamp.seconds * 1000
-                      ).toLocaleTimeString()}
+                      {new Date(item.timeStamp.seconds * 1000).toLocaleString()}
                     </Text>
                   </View>
                 </View>
-
-                <Text style={{ fontSize: 25, fontWeight: "bold" }}>
-                  -${item.amountSend}
+                <Text style={styles.transactionAmount}>
+                  -${item.amountSent}
                 </Text>
               </View>
             </View>
           )}
         />
       </View>
-      <View
-        style={{
-          borderBottomColor: "lightgray",
-          borderBottomWidth: StyleSheet.hairlineWidth,
-          margin: 10,
-        }}
-      />
+
+      {/* Divider */}
+      <View style={styles.transactionDivider} />
     </ScrollView>
   );
 };
@@ -267,12 +192,24 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
   },
+  centeredContainer: {
+    justifyContent: "center",
+  },
+  whiteText: {
+    color: "white",
+  },
   header: {
     height: 120,
     padding: 20,
     borderRadius: 25,
     alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#2ecc71",
+  },
+  divider: {
+    borderBottomColor: "lightgray",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    margin: 30,
   },
   headerText: {
     fontWeight: "500",
@@ -282,54 +219,33 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     fontSize: 25,
   },
-  inputContainer: {
-    gap: 3,
-    marginBottom: 30,
-  },
-  nameRowContainer: {
-    width: "100%",
-    justifyContent: "space-between",
+  rowContainer: {
+    marginTop: 10,
     flexDirection: "row",
-    marginBottom: 7,
-    gap: 7,
+    justifyContent: "space-between",
   },
-  input: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 10,
-    marginTop: 5,
-    marginBottom: 10,
-    borderWidth: 0.4,
-  },
-  inputName: {
-    width: "100%",
-    flex: 1,
-    backgroundColor: "white",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 10,
-    marginTop: 5,
-    borderWidth: 0.4,
-  },
-  buttonContainer: {
-    alignItems: "center",
-    gap: 10,
-  },
-  button: {
-    backgroundColor: "#2ecc71",
-    width: "100%",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
+  sectionTitle: {
+    fontSize: 17,
     fontWeight: "500",
-    fontSize: 15,
   },
-  imageContainer: {
-    flex: 1,
-    width: undefined,
+  sectionLink: {
+    fontWeight: "bold",
+    color: "#2ecc71",
+  },
+  transactionDivider: {
+    borderBottomColor: "lightgray",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    margin: 10,
+  },
+  transactionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 5,
+  },
+  transactionInfo: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   circle: {
     width: 40,
@@ -338,5 +254,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#2ecc71",
     justifyContent: "center",
     alignItems: "center",
+  },
+  transactionDetails: {
+    marginStart: 10,
+  },
+  transactionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  transactionAmount: {
+    fontSize: 25,
+    fontWeight: "bold",
   },
 });

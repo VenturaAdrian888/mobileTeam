@@ -1,17 +1,14 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Login from "./screens/Login";
-import Register from "./screens/Register";
-import Dashboard from "./screens/Dashboard";
-import Profile from "./screens/Profile";
-import SendCash from "./screens/SendCash";
-import TransactionHistory from "./screens/TransactionHistory";
-import CoinListScreen from "./screens/CoinList";
-import Try from "./screens/Try";
-import { View, Text, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import TransactionListReceived from "./screens/TransactionListReceived";
-import TransactionListSend from "./screens/TransactionListSend";
+import LoginScreen from "./screens/Login";
+import RegisterScreen from "./screens/Register";
+import DashboardScreen from "./screens/Dashboard";
+import ProfileScreen from "./screens/Profile";
+import SendScreen from "./screens/Send";
+import TransactionHistoryScreen from "./screens/TransactionHistory";
+import CoinListsScreen from "./screens/CoinLists";
+import TransactionReceivedScreen from "./screens/TransactionReceived";
+import TransactionSentScreen from "./screens/TransactionSent";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,68 +17,77 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
-          options={{ headerShadowVisible: false, headerTitle: "" }}
           name="Login"
-          component={Login}
+          component={LoginScreen}
+          options={{
+            headerShadowVisible: false,
+            headerTitle: "",
+          }}
         />
         <Stack.Screen
-          options={{ headerShadowVisible: false, headerTitle: "" }}
           name="Register"
-          component={Register}
+          component={RegisterScreen}
+          options={{
+            headerShadowVisible: false,
+            headerTitle: "",
+          }}
         />
         <Stack.Screen
           name="Dashboard"
-          component={Dashboard}
+          component={DashboardScreen}
           options={{
             headerShadowVisible: false,
             headerBackVisible: false,
-            headerRight: () => (
-              <TouchableOpacity
-                onPress={() => alert("This is profile button!")}
-              >
-                <View>
-                  <Ionicons
-                    name="person-circle-outline"
-                    size={30}
-                    color="black"
-                  />
-                </View>
-              </TouchableOpacity>
-            ),
           }}
         />
-
         <Stack.Screen
-          options={{ headerShadowVisible: false, headerTitle: "" }}
           name="Send"
-          component={SendCash}
+          component={SendScreen}
+          options={{
+            headerShadowVisible: false,
+            headerTitle: "",
+          }}
         />
         <Stack.Screen
-          options={{ headerShadowVisible: false, headerTitle: "History" }}
-          name="TransactionHistory"
-          component={TransactionHistory}
-        />
-        <Stack.Screen
-          options={{ headerShadowVisible: false, headerTitle: "" }}
           name="Profile"
-          component={Profile}
+          component={ProfileScreen}
+          options={{
+            headerShadowVisible: false,
+            headerTitle: "Profile",
+          }}
         />
         <Stack.Screen
-          options={{ headerShadowVisible: false, headerTitle: "" }}
-          name="CoinListScreen"
-          component={CoinListScreen}
+          name="CoinLists"
+          component={CoinListsScreen}
+          options={{
+            headerShadowVisible: false,
+            headerTitle: "Coins",
+          }}
         />
         <Stack.Screen
-          options={{ headerShadowVisible: false, headerTitle: "" }}
+          name="TransactionHistory"
+          component={TransactionHistoryScreen}
+          options={{
+            headerShadowVisible: false,
+            headerTitle: "History",
+          }}
+        />
+        <Stack.Screen
           name="TransactionReceived"
-          component={TransactionListReceived}
+          component={TransactionReceivedScreen}
+          options={{
+            headerShadowVisible: false,
+            headerTitle: "",
+          }}
         />
         <Stack.Screen
-          options={{ headerShadowVisible: false, headerTitle: "" }}
-          name="TransactionSend"
-          component={TransactionListSend}
+          name="TransactionSent"
+          component={TransactionSentScreen}
+          options={{
+            headerShadowVisible: false,
+            headerTitle: "",
+          }}
         />
-        <Stack.Screen name="Try" component={Try} />
       </Stack.Navigator>
     </NavigationContainer>
   );
