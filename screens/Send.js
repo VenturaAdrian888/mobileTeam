@@ -10,6 +10,8 @@ import {
 import { auth, db, firebase } from "../lib/Firebase";
 import { runTransaction } from "firebase/firestore";
 import { Ionicons } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/native";
+
 
 const Send = () => {
   // Get the current user's UID
@@ -20,6 +22,9 @@ const Send = () => {
   const [recentContactsList, setRecentContactsList] = useState([]);
   const [receiverUID, setReceiverUID] = useState("");
   const [amount, setAmount] = useState("");
+  // Retrieve the passed data from scanned qr
+  const route = useRoute()
+  const scannedData = route.params?.scannedData
 
   // Firebase references
   const currentUserRef = firebase.firestore().collection("Users");
@@ -40,6 +45,9 @@ const Send = () => {
     setReceiverUID("");
     setAmount("");
   };
+
+ 
+  
 
   // Retrieve recent contacts from sent transactions
   const getRecentContacts = () => {
@@ -78,6 +86,9 @@ const Send = () => {
   useEffect(() => {
     loadData();
     getRecentContacts();
+    //Set the uid to the passed Scanned QR
+    setReceiverUID(scannedData);
+
   }, []);
 
   // Update sender and receiver data in a transaction
@@ -155,6 +166,7 @@ const Send = () => {
         <Text style={styles.headerText}>Send money</Text>
         <View>
           <Text style={styles.label}>Recent Contacts</Text>
+          <Text>{scannedData}</Text>
           <View style={styles.recentContactsContainer}>
             <FlatList
               data={recentContactsList}

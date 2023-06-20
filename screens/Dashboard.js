@@ -65,7 +65,7 @@ const Dashboard = () => {
 
         <Pressable
           style={styles.mediumButtonContainer}
-          onPress={() => console.log("Pressed")}
+          onPress={() => navigation.navigate("QrCode")}
         >
           <View style={styles.circleContainer}>
             <View style={styles.circle}>

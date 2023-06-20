@@ -9,7 +9,9 @@ import TransactionHistoryScreen from "./screens/TransactionHistory";
 import CoinListsScreen from "./screens/CoinLists";
 import TransactionReceivedScreen from "./screens/TransactionReceived";
 import TransactionSentScreen from "./screens/TransactionSent";
-
+import GenerateQr from "./screens/GenerateQr";
+import QrCode from "./screens/QrCode";
+import ScanQr from "./screens/ScanQr";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -83,6 +85,30 @@ export default function App() {
         <Stack.Screen
           name="TransactionSent"
           component={TransactionSentScreen}
+          options={{
+            headerShadowVisible: false,
+            headerTitle: "",
+          }}
+        />
+        <Stack.Screen
+          name="QrCode"
+          component={QrCode}
+          options={{
+            headerShadowVisible: false,
+            headerTitle: "",
+          }}
+        />
+        <Stack.Screen
+          name="GenerateQr"
+          component={GenerateQr}
+          options={{
+            headerShadowVisible: false,
+            headerTitle: "",
+          }}
+        />
+        <Stack.Screen
+          name="ScanQr"
+          component={ScanQr}
           options={{
             headerShadowVisible: false,
             headerTitle: "",
