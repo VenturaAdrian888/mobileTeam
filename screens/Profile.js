@@ -8,7 +8,6 @@ import {
   TextInput,
   Button,
   Image,
-  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { auth, firebase } from "../lib/Firebase";
@@ -18,12 +17,8 @@ export default function Profile() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
-  const handleCardPress = (cardName) => {
-    if (cardName === "Profile Update") {
-      setIsModalVisible(true);
-    } else {
-      console.log(`Clicked on ${cardName} card!`);
-    }
+  const handleCardPress = () => {
+    setIsModalVisible(true);
   };
 
   const pass = auth.currentUser;
@@ -75,46 +70,16 @@ export default function Profile() {
         <Text style={styles.userName}>
           {current.firstName} {current.lastName}
         </Text>
-        <View style={styles.column}>
-          <Text style={styles.text}>Account Number: </Text>
-
-          <Text style={styles.balance}>{uid}</Text>
+        <View style={styles.accountNumberContainer}>
+          <Text style={styles.accountNumberTitle}>Account Number</Text>
+          <Text style={styles.accountNumber}>{uid}</Text>
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.cardContainer}>
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => handleCardPress("Card 1")}
-        >
-          <Ionicons name="ios-speedometer" size={60} color="white" />
-          <Text style={styles.cardText}>Card 1</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => handleCardPress("Card 2")}
-        >
-          <Ionicons name="ios-alarm" size={60} color="white" />
-          <Text style={styles.cardText}>Card 2</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => handleCardPress("Card 3")}
-        >
-          <Ionicons name="ios-wallet" size={60} color="white" />
-          <Text style={styles.cardText}>Card 3</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => handleCardPress("Profile Update")}
-        >
-          <Ionicons name="ios-person" size={60} color="white" />
-          <Text style={styles.cardText}>Update Profile</Text>
-        </TouchableOpacity>
-      </ScrollView>
+      <TouchableOpacity style={styles.card} onPress={handleCardPress}>
+        <Ionicons name="ios-person" size={60} color="white" />
+        <Text style={styles.cardText}>Update Profile</Text>
+      </TouchableOpacity>
 
       {/* Profile Update Modal */}
       <Modal visible={isModalVisible} animationType="slide">
@@ -142,22 +107,11 @@ export default function Profile() {
 }
 
 const styles = StyleSheet.create({
-  column: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#F1F3F6",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    position: "absolute",
-    top: 10,
-    left: 10,
   },
   profileContainer: {
     alignItems: "center",
@@ -176,26 +130,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#333",
   },
-  text: {
-    fontSize: 18,
-    textAlign: "center",
-    color: "#222",
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  balance: {
-    fontSize: 18,
-    textAlign: "center",
-    color: "#222",
-    marginBottom: 10,
-  },
-  cardContainer: {
-    flexGrow: 1,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
+  accountNumberContainer: {
     alignItems: "center",
-    marginHorizontal: 10,
+  },
+  accountNumberTitle: {
+    fontSize: 18,
+    color: "#666",
+    marginBottom: 5,
+  },
+  accountNumber: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#222",
   },
   card: {
     width: 150,
